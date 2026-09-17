@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -74,6 +73,8 @@ fun OnboardingScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
+    androidx.compose.foundation.layout.Box(modifier = Modifier.fillMaxSize()) {
+        com.orbit.blocker.ui.components.SpaceBackground(modifier = Modifier.fillMaxSize())
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -135,6 +136,7 @@ fun OnboardingScreen(
             )
         }
     }
+    }
 }
 
 @Composable
@@ -145,8 +147,10 @@ private fun PermissionStep(
     buttonText: String,
     onClick: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
-        Column(modifier = Modifier.padding(16.dp)) {
+    com.orbit.blocker.ui.components.GlassCard(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+    ) {
+        Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = if (granted) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,

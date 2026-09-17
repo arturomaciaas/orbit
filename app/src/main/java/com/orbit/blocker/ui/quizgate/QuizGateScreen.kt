@@ -1,6 +1,12 @@
 package com.orbit.blocker.ui.quizgate
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,10 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,12 +22,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.orbit.blocker.domain.quiz.QuizResult
 import com.orbit.blocker.domain.quiz.displayName
+import com.orbit.blocker.ui.components.GlassProgressBar
+import com.orbit.blocker.ui.components.SpaceBackground
+import com.orbit.blocker.ui.theme.CometCyan
+import com.orbit.blocker.ui.theme.GlassBorder
+import com.orbit.blocker.ui.theme.GlassFill
+import com.orbit.blocker.ui.theme.NebulaViolet
 
 /**
  * The full-screen quiz gate. Reusable: [onPassed] and [onFailed] let callers react
@@ -45,14 +57,16 @@ fun QuizGateScreen(
 
     LaunchedEffect(Unit) { viewModel.start() }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        when (val s = state) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        SpaceBackground(modifier = Modifier.fillMaxSize())
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            when (val s = state) {
             QuizGateState.Loading -> CircularProgressIndicator()
 
             is QuizGateState.NotEnoughQuestions -> {
@@ -87,6 +101,7 @@ fun QuizGateScreen(
                     if (s.result.passed) onPassed(s.result) else onFailed(s.result)
                 },
             )
+            }
         }
     }
 }
@@ -112,12 +127,12 @@ private fun QuizInProgress(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp),
         )
-        LinearProgressIndicator(
-            progress = { (state.index + 1f) / state.total },
+        GlassProgressBar(
+            progress = (state.index + 1f) / state.total,
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
         )
         Text(
-            state.question.topic.displayName,
+            state.question.topic.displayName.uppercase(),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
         )
@@ -129,26 +144,11 @@ private fun QuizInProgress(
         )
 
         state.question.choices.forEachIndexed { index, choice ->
-            val selected = state.selectedIndex == index
-            Card(
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (selected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.surfaceVariant,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp)
-                    .selectable(selected = selected, onClick = { onSelect(index) }),
-            ) {
-                Text(
-                    choice,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (selected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(16.dp),
-                )
-            }
+            ChoiceCard(
+                text = choice,
+                selected = state.selectedIndex == index,
+                onClick = { onSelect(index) },
+            )
         }
 
         Button(
@@ -158,6 +158,40 @@ private fun QuizInProgress(
         ) {
             Text(if (state.isLast) "Submit" else "Next")
         }
+    }
+}
+
+@Composable
+private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(16.dp)
+    val textColor by animateColorAsState(
+        if (selected) Color.Black else MaterialTheme.colorScheme.onSurface,
+        tween(200),
+        label = "choiceText",
+    )
+    val fill = if (selected) {
+        Brush.horizontalGradient(listOf(CometCyan.copy(alpha = 0.95f), NebulaViolet.copy(alpha = 0.95f)))
+    } else {
+        Brush.horizontalGradient(listOf(GlassFill.copy(alpha = 0.10f), GlassFill.copy(alpha = 0.06f)))
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .clip(shape)
+            .background(fill, shape)
+            .border(
+                BorderStroke(1.dp, GlassBorder.copy(alpha = if (selected) 0.5f else 0.2f)),
+                shape,
+            )
+            .selectable(selected = selected, onClick = onClick),
+    ) {
+        Text(
+            text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = textColor,
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }
 

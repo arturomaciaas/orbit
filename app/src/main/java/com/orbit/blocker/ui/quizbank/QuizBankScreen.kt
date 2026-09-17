@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -34,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.orbit.blocker.data.model.Question
 import com.orbit.blocker.data.model.QuizTopic
 import com.orbit.blocker.domain.quiz.displayName
+import com.orbit.blocker.ui.components.GlassCard
 
 @Composable
 fun QuizBankScreen(viewModel: QuizBankViewModel = hiltViewModel()) {
@@ -112,8 +112,8 @@ private fun QuestionCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
+    GlassCard(modifier = Modifier.fillMaxWidth(), cornerRadius = 18.dp) {
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

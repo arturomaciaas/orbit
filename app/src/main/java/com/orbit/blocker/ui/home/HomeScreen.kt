@@ -10,7 +10,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.orbit.blocker.domain.gamification.GalaxyEngine
+import com.orbit.blocker.ui.components.GlassCard
+import com.orbit.blocker.ui.components.GlassProgressBar
+import com.orbit.blocker.ui.components.SectionLabel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
@@ -40,16 +44,25 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Your Cosmos", style = MaterialTheme.typography.headlineLarge)
-        Text(
-            visual.title,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary,
-        )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Column {
+            SectionLabel("Your cosmos")
+            Text(
+                visual.title,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
 
+        // The planet/galaxy sits directly on the space backdrop (no card) for maximum impact.
         Box(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f).padding(vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
             GalaxyCanvas(
@@ -59,25 +72,38 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
             )
         }
 
-        // Progress toward the next stage.
-        val overall = GalaxyEngine.overallFraction(progress)
-        Text(
-            "Overall growth ${(overall * 100).toInt()}%",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        LinearProgressIndicator(
-            progress = { progress.progress },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        )
+        // Growth card.
+        GlassCard(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text("Growth", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    "${(GalaxyEngine.overallFraction(progress) * 100).toInt()}%",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            Text(
+                "Progress toward the next stage",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp, bottom = 12.dp),
+            )
+            GlassProgressBar(progress = progress.progress, modifier = Modifier.fillMaxWidth())
+        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Stat(label = "Sessions", value = progress.totalSessionsCompleted.toString())
-            Stat(label = "Streak", value = "${progress.currentStreakDays}d")
-            Stat(label = "Best", value = "${progress.longestStreakDays}d")
+        // Stats card.
+        GlassCard(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Stat(label = "Sessions", value = progress.totalSessionsCompleted.toString())
+                Stat(label = "Streak", value = "${progress.currentStreakDays}d")
+                Stat(label = "Best", value = "${progress.longestStreakDays}d")
+            }
         }
     }
 }
@@ -85,9 +111,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 @Composable
 private fun Stat(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, style = MaterialTheme.typography.headlineLarge)
         Text(
-            label,
+            value,
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            label.uppercase(),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
