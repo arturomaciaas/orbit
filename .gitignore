@@ -27,9 +27,9 @@ local.properties
 hs_err_pid*
 replay_pid*
 
-# Keystores / secrets — never commit these
+# Keystores / secrets
 *.jks
 *.keystore
 
-# NOTE: The Gradle wrapper JAR (gradle/wrapper/gradle-wrapper.jar) is intentionally
-# NOT ignored. It must be committed so the project builds from a fresh clone.
+# Icon
+orbit.png

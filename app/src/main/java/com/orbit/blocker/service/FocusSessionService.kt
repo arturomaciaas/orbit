@@ -113,7 +113,7 @@ class FocusSessionService : android.app.Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setContentTitle("Focus session in progress")
             .setContentText("${DurationFormatter.format(remainingMillis)} remaining")
             .setOngoing(true)
@@ -125,7 +125,7 @@ class FocusSessionService : android.app.Service() {
 
     private fun buildCompletedNotification(): Notification =
         NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setContentTitle("Focus session complete")
             .setContentText("Your cosmos grew. Nice work.")
             .setAutoCancel(true)
