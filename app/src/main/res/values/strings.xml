@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Orbit</string>
+    <string name="accessibility_service_description">Orbit watches which app comes to the foreground so it can show the quiz gate over apps you have blocked. It does not read screen content.</string>
+</resources>

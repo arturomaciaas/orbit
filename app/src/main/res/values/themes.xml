@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme. The Compose UI drives actual colors via the app's Material 3
+         color scheme; this theme mainly configures the system window chrome for a
+         dark, edge-to-edge space aesthetic. -->
+    <style name="Theme.Orbit" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/orbit_space_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

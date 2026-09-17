@@ -1,0 +1,10 @@
+R_DEF: Internal format may change without notice
+local
+color orbit_space_background
+drawable ic_launcher_foreground
+mipmap ic_launcher
+mipmap ic_launcher_round
+string accessibility_service_description
+string app_name
+style Theme.Orbit
+xml accessibility_service_config
