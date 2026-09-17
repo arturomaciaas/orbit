@@ -66,9 +66,4 @@ class SettingsViewModel @Inject constructor(
     fun clearBackupStatus() {
         _backupStatus.value = BackupStatus.Idle
     }
-
-    /** Resets the onboarding flag so the guided setup shows again on next launch/root recompose. */
-    fun rerunOnboarding() {
-        viewModelScope.launch { settings.setOnboardingComplete(false) }
-    }
 }

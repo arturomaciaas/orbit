@@ -34,7 +34,7 @@ import com.orbit.blocker.service.NotificationAccessPermission
 
 @Composable
 fun SettingsScreen(
-    onOpenQuizGateDemo: () -> Unit,
+    onOpenQuizBank: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val questionsRequired by viewModel.questionsRequired.collectAsStateWithLifecycle()
@@ -126,6 +126,21 @@ fun SettingsScreen(
         }
 
         Column {
+            Text("Quiz bank", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "Create, edit, and delete the questions used to unlock blocked apps.",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedButton(
+                onClick = onOpenQuizBank,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            ) {
+                Text("Manage quiz questions")
+            }
+        }
+
+        Column {
             Text("Backup", style = MaterialTheme.typography.titleLarge)
             Text(
                 "Export your blocks, question bank, and cosmos progress to a file, or restore from one.",
@@ -161,24 +176,5 @@ fun SettingsScreen(
             }
         }
 
-        Column {
-            Text("Setup", style = MaterialTheme.typography.titleLarge)
-            OutlinedButton(
-                onClick = viewModel::rerunOnboarding,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            ) {
-                Text("Show setup guide again")
-            }
-        }
-
-        Column {
-            Text("Developer", style = MaterialTheme.typography.titleLarge)
-            OutlinedButton(
-                onClick = onOpenQuizGateDemo,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            ) {
-                Text("Preview quiz gate")
-            }
-        }
     }
 }

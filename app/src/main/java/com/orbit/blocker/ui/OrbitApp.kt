@@ -3,13 +3,7 @@ package com.orbit.blocker.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,19 +16,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.orbit.blocker.ui.blocks.BlocksScreen
+import com.orbit.blocker.ui.components.DockItem
+import com.orbit.blocker.ui.components.GlassDock
 import com.orbit.blocker.ui.components.SpaceBackground
 import com.orbit.blocker.ui.digest.DigestScreen
 import com.orbit.blocker.ui.focus.FocusScreen
 import com.orbit.blocker.ui.home.HomeScreen
 import com.orbit.blocker.ui.navigation.OrbitDestination
 import com.orbit.blocker.ui.quizbank.QuizBankScreen
-import com.orbit.blocker.ui.quizgate.QuizGateScreen
 import com.orbit.blocker.ui.settings.SettingsScreen
-import com.orbit.blocker.ui.theme.CometCyan
-import com.orbit.blocker.ui.theme.GlassFill
-
-/** Non-tab route for exercising the quiz gate standalone. */
-private const val ROUTE_QUIZ_GATE_DEMO = "quiz_gate_demo"
 
 /**
  * Root composable. A single animated [SpaceBackground] lives behind a transparent
@@ -52,15 +42,14 @@ fun OrbitApp() {
         Scaffold(
             containerColor = Color.Transparent,
             bottomBar = {
-                NavigationBar(
-                    containerColor = GlassFill.copy(alpha = 0.06f),
-                    tonalElevation = 0.dp,
-                ) {
-                    OrbitDestination.entries.forEach { dest ->
+                GlassDock(
+                    items = OrbitDestination.bottomBar.map { dest ->
                         val selected = backStackEntry?.destination?.hierarchy?.any {
                             it.route == dest.route
                         } == true
-                        NavigationBarItem(
+                        DockItem(
+                            icon = dest.icon,
+                            label = dest.label,
                             selected = selected,
                             onClick = {
                                 navController.navigate(dest.route) {
@@ -71,18 +60,10 @@ fun OrbitApp() {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(dest.icon, contentDescription = dest.label) },
-                            label = { Text(dest.label) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Color.Black,
-                                selectedTextColor = CometCyan,
-                                indicatorColor = CometCyan,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            ),
                         )
-                    }
-                }
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
             },
         ) { padding ->
             NavHost(
@@ -97,14 +78,7 @@ fun OrbitApp() {
                 composable(OrbitDestination.DIGEST.route) { DigestScreen() }
                 composable(OrbitDestination.SETTINGS.route) {
                     SettingsScreen(
-                        onOpenQuizGateDemo = { navController.navigate(ROUTE_QUIZ_GATE_DEMO) },
-                    )
-                }
-                composable(ROUTE_QUIZ_GATE_DEMO) {
-                    QuizGateScreen(
-                        onPassed = { navController.popBackStack() },
-                        onFailed = { navController.popBackStack() },
-                        onDismissNotEnough = { navController.popBackStack() },
+                        onOpenQuizBank = { navController.navigate(OrbitDestination.QUIZ.route) },
                     )
                 }
             }

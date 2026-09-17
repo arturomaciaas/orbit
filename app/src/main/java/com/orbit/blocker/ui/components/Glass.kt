@@ -7,22 +7,27 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -161,4 +166,98 @@ private fun lerpAlpha(from: Color, to: Color, t: Float, base: Float, top: Float)
         blue = from.blue + (to.blue - from.blue) * t,
     )
     return c.copy(alpha = base + (top - base) * t)
+}
+
+/** A single item inside [GlassDock]: an icon over a small label, tappable. */
+data class DockItem(
+    val icon: ImageVector,
+    val label: String,
+    val selected: Boolean,
+    val onClick: () -> Unit,
+)
+
+/**
+ * A centered, floating "liquid glass" dock for bottom navigation. Renders a frosted,
+ * pill-shaped bar that hugs its content (rather than filling the width) and floats
+ * centered over the animated space backdrop. The selected item gets a glowing accent
+ * capsule that animates as selection changes.
+ */
+@Composable
+fun GlassDock(
+    items: List<DockItem>,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(50)
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Row(
+            modifier = Modifier
+                .clip(shape)
+                .background(
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            GlassHighlight.copy(alpha = 0.14f),
+                            GlassFill.copy(alpha = 0.10f),
+                            GlassFill.copy(alpha = 0.06f),
+                        ),
+                    ),
+                    shape = shape,
+                )
+                .border(
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.verticalGradient(
+                            listOf(
+                                GlassBorder.copy(alpha = 0.35f),
+                                GlassBorder.copy(alpha = 0.08f),
+                            ),
+                        ),
+                    ),
+                    shape = shape,
+                )
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            items.forEach { item -> GlassDockItem(item) }
+        }
+    }
+}
+
+@Composable
+private fun GlassDockItem(item: DockItem) {
+    val shape = RoundedCornerShape(50)
+    val fill by animateFloatAsState(if (item.selected) 1f else 0f, tween(220), label = "dockFill")
+    val contentColor by animateColorAsState(
+        if (item.selected) CometCyan else MaterialTheme.colorScheme.onSurfaceVariant,
+        tween(220),
+        label = "dockText",
+    )
+    Column(
+        modifier = Modifier
+            .clip(shape)
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        lerpAlpha(GlassFill, CometCyan, fill, base = 0f, top = 0.18f),
+                        lerpAlpha(GlassFill, NebulaViolet, fill, base = 0f, top = 0.14f),
+                    ),
+                ),
+                shape = shape,
+            )
+            .border(
+                BorderStroke(1.dp, GlassBorder.copy(alpha = 0.28f * fill)),
+                shape,
+            )
+            .clickable(onClick = item.onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Icon(item.icon, contentDescription = item.label, tint = contentColor)
+        Text(
+            text = item.label,
+            style = MaterialTheme.typography.labelSmall,
+            color = contentColor,
+        )
+    }
 }

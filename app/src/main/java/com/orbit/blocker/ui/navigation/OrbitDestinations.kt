@@ -14,17 +14,24 @@ enum class OrbitDestination(
     val route: String,
     val label: String,
     val icon: ImageVector,
+    /** Whether this destination appears in the bottom dock. */
+    val showInBottomBar: Boolean = true,
 ) {
     HOME("home", "Cosmos", Icons.Filled.Public),
     FOCUS("focus", "Focus", Icons.Filled.Timer),
     BLOCKS("blocks", "Blocks", Icons.Filled.Block),
-    QUIZ("quiz", "Quiz Bank", Icons.Filled.Quiz),
+    // Quiz Bank is reachable from Settings, so it is hidden from the dock.
+    QUIZ("quiz", "Quiz Bank", Icons.Filled.Quiz, showInBottomBar = false),
     DIGEST("digest", "Digest", Icons.Filled.Notifications),
     SETTINGS("settings", "Settings", Icons.Filled.Settings),
     ;
 
     companion object {
         val START = HOME
+
+        /** Destinations shown in the bottom dock, in order. */
+        val bottomBar: List<OrbitDestination> = entries.filter { it.showInBottomBar }
+
         fun fromRoute(route: String?): OrbitDestination =
             entries.firstOrNull { it.route == route } ?: START
     }

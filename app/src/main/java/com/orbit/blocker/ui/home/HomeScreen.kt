@@ -98,7 +98,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
             ) {
                 Stat(label = "Sessions", value = progress.totalSessionsCompleted.toString())
                 Stat(label = "Streak", value = "${progress.currentStreakDays}d")
