@@ -14,7 +14,7 @@
   <img alt="Hilt" src="https://img.shields.io/badge/Hilt-FF7043" />
 </p>
 
-<img src="docs/assets/video.gif" alt="Orbit walkthrough"/>
+<img src="docs/assets/video.gif" alt="Orbit walkthrough" width="480" />
 
 </div>
 
@@ -29,7 +29,7 @@ I made it with the goal of spending less time on my phone so I can study more an
 When you open a blocked app, Orbit intercepts it and asks you quiz questions before letting you in. Focus sessions grow an animated cosmos. Wrong answers trigger a meteor strike that sets you back. Noisy app notifications get sorted into tiers so only what matters reaches you. Quiz questions include the following topics: [software engineering, system design, AWS, chess].
 
 <div align="center">
-<img src="docs/assets/question.jpg" alt="A question from Orbit"/>
+<img src="docs/assets/question.jpg" alt="A question from Orbit" width="480" />
 </div>
 
 ## Tech
