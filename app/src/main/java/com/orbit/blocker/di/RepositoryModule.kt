@@ -14,6 +14,7 @@ import com.orbit.blocker.data.repository.NotificationRepositoryImpl
 import com.orbit.blocker.data.repository.QuestionRepository
 import com.orbit.blocker.data.repository.QuestionRepositoryImpl
 import com.orbit.blocker.data.settings.OrbitSettings
+import com.orbit.blocker.domain.focus.FocusSessionStore
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -43,6 +44,9 @@ abstract class RepositoryModule {
 
     @Binds @Singleton
     abstract fun bindFocusSessionRepository(impl: FocusSessionRepositoryImpl): FocusSessionRepository
+
+    @Binds @Singleton
+    abstract fun bindFocusSessionStore(impl: OrbitSettings): FocusSessionStore
 
     companion object {
         @Provides

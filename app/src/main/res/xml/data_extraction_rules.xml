@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Orbit is a fully local, single-user, single-device app. Its state (blocks, focus
+  sessions, cosmos progress, settings) is intentionally NOT portable: it must never be
+  carried to another device or restored after an uninstall, otherwise stale state
+  (e.g. a leftover allow-list or an empty focus session) resurfaces and corrupts the
+  clean-install experience. Backup/restore of user data is handled explicitly and
+  manually via the in-app JSON export/import.
+
+  On Android 12+ this file (not the deprecated android:allowBackup flag) governs both
+  cloud backup and device-to-device transfer. We disable both entirely.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

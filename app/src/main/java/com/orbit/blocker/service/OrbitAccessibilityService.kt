@@ -5,6 +5,7 @@ import android.content.Context
 import android.media.AudioManager
 import android.view.accessibility.AccessibilityEvent
 import com.orbit.blocker.domain.block.BlockEnforcer
+import com.orbit.blocker.domain.block.CallStateGate
 import com.orbit.blocker.gate.QuizGateActivity
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -31,6 +32,7 @@ class OrbitAccessibilityService : AccessibilityService() {
     }
 
     private lateinit var blockEnforcer: BlockEnforcer
+    private val callStateGate = CallStateGate()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     // Debounce: ignore the same package within this window, and while a gate is pending.
@@ -63,11 +65,17 @@ class OrbitAccessibilityService : AccessibilityService() {
 
         if (gatePending) return
 
-        // Never throw the gate up during an active call. The window is time-boxed and
-        // re-gating is purely event-driven (we don't proactively kick the user out), so a
-        // call that outlives its access grant is left alone — the gate only reappears on the
-        // next foreground change *after* the call ends. This guarantees Orbit never hangs up.
-        if (isCallActive()) return
+        // Never throw the gate up during an active call — it could hang up a phone call or
+        // disrupt a VoIP call. The audio communication mode covers both cellular and VoIP, but
+        // VoIP apps can leave it stuck; [CallStateGate] bounds how long a standalone
+        // communication-mode signal is trusted so a stuck mode can't disable blocking forever.
+        if (callStateGate.shouldSuppressGate(
+                audioInCommunication = isAudioInCommunication(),
+                now = now,
+            )
+        ) {
+            return
+        }
 
         scope.launch {
             if (blockEnforcer.shouldGate(pkg, now)) {
@@ -78,10 +86,12 @@ class OrbitAccessibilityService : AccessibilityService() {
     }
 
     /**
-     * True when the device is in a phone or VoIP call. [AudioManager.MODE_IN_CALL] covers
-     * cellular calls; [AudioManager.MODE_IN_COMMUNICATION] covers VoIP (WhatsApp, Meet, etc.).
+     * True when the audio system is in a call/communication mode. [AudioManager.MODE_IN_CALL]
+     * covers cellular calls; [AudioManager.MODE_IN_COMMUNICATION] covers VoIP (WhatsApp, Meet,
+     * etc.). Unreliable on its own (VoIP apps can leave it stuck), so [CallStateGate] bounds how
+     * long it is trusted.
      */
-    private fun isCallActive(): Boolean {
+    private fun isAudioInCommunication(): Boolean {
         val audio = getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return false
         return audio.mode == AudioManager.MODE_IN_CALL ||
             audio.mode == AudioManager.MODE_IN_COMMUNICATION

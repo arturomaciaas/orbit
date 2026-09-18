@@ -27,7 +27,17 @@ sealed interface QuizGateState {
         val required: Int,
         val selectedIndex: Int?,
         val isLast: Boolean,
-    ) : QuizGateState
+        /**
+         * True once the user has submitted their answer for this question. While revealed,
+         * choices are locked and colored correct/incorrect, and the explanation is shown for
+         * a wrong answer.
+         */
+        val revealed: Boolean = false,
+    ) : QuizGateState {
+        val correctIndex: Int get() = question.correctIndex
+        /** The submitted answer was wrong (only meaningful once [revealed]). */
+        val answeredWrong: Boolean get() = revealed && selectedIndex != correctIndex
+    }
     data class Finished(val result: QuizResult) : QuizGateState
 }
 
@@ -42,6 +52,9 @@ class QuizGateViewModel @Inject constructor(
 
     private var session: QuizSession? = null
 
+    /** Indices of questions whose answer has been submitted (revealed + locked). */
+    private val revealedIndices = mutableSetOf<Int>()
+
     /** Loads a fresh quiz. Call once when the gate opens. */
     fun start() {
         viewModelScope.launch {
@@ -54,16 +67,31 @@ class QuizGateViewModel @Inject constructor(
             // Pull a balanced set sized to the requirement (a small buffer could be added later).
             val picked = QuestionSelector.pickBalanced(pool, required)
             session = QuizSession(picked, required)
+            revealedIndices.clear()
             emitInProgress()
         }
     }
 
+    /** Records a choice for the current question. No-op once the answer has been submitted. */
     fun select(choiceIndex: Int) {
         val s = session ?: return
+        if (s.currentIndex in revealedIndices) return // locked after submit
         s.select(choiceIndex)
         emitInProgress()
     }
 
+    /**
+     * Submits the current answer, revealing whether it was correct. Choices lock and the
+     * explanation is shown for a wrong answer. Requires a selection; otherwise a no-op.
+     */
+    fun submitAnswer() {
+        val s = session ?: return
+        if (s.selectedForCurrent() == null) return
+        revealedIndices += s.currentIndex
+        emitInProgress()
+    }
+
+    /** Advances to the next question, or finishes and grades the whole session on the last one. */
     fun next() {
         val s = session ?: return
         if (s.isLast) {
@@ -83,6 +111,7 @@ class QuizGateViewModel @Inject constructor(
             required = s.required,
             selectedIndex = s.selectedForCurrent(),
             isLast = s.isLast,
+            revealed = s.currentIndex in revealedIndices,
         )
     }
 }

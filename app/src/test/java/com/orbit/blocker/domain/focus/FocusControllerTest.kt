@@ -9,12 +9,23 @@ import com.orbit.blocker.data.repository.FocusSessionRepository
 import com.orbit.blocker.data.repository.GalaxyRepository
 import com.orbit.blocker.domain.gamification.GamificationEvents
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.random.Random
 import org.junit.Test
 
 class FocusControllerTest {
+
+    /** In-memory store so FocusSessionManager can be built without Android/DataStore. */
+    private class FakeFocusSessionStore : FocusSessionStore {
+        private val flow = MutableStateFlow(FocusSessionState.INACTIVE)
+        override val activeFocusSession: Flow<FocusSessionState> = flow
+        override suspend fun saveActiveFocusSession(state: FocusSessionState) { flow.value = state }
+        override suspend fun clearActiveFocusSession() { flow.value = FocusSessionState.INACTIVE }
+    }
+
+    private fun newManager() = FocusSessionManager(FakeFocusSessionStore())
 
     private class FakeFocusRepo : FocusSessionRepository {
         val recorded = mutableListOf<FocusSessionRecord>()
@@ -56,7 +67,7 @@ class FocusControllerTest {
 
     @Test
     fun complete_recordsCompletedAndGrows() = runTest {
-        val manager = FocusSessionManager()
+        val manager = newManager()
         val repo = FakeFocusRepo()
         val gam = SpyGamification()
         val c = controller(repo, gam, manager)
@@ -75,7 +86,7 @@ class FocusControllerTest {
 
     @Test
     fun abort_recordsAbortedNoGrowth() = runTest {
-        val manager = FocusSessionManager()
+        val manager = newManager()
         val repo = FakeFocusRepo()
         val gam = SpyGamification()
         val c = controller(repo, gam, manager)
@@ -90,7 +101,7 @@ class FocusControllerTest {
 
     @Test
     fun completeWhenInactive_isNoOp() = runTest {
-        val manager = FocusSessionManager()
+        val manager = newManager()
         val repo = FakeFocusRepo()
         val gam = SpyGamification()
         val c = controller(repo, gam, manager)

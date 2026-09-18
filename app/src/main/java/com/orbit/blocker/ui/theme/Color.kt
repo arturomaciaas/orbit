@@ -14,6 +14,7 @@ val NebulaTeal = Color(0xFF3FE0C5)
 val StarWhite = Color(0xFFE7ECFF)
 val CometCyan = Color(0xFF54E1FF)
 val MeteorRed = Color(0xFFFF6B6B)
+val AuroraGreen = Color(0xFF4BE38B)    // "correct answer" positive feedback
 val SolarGold = Color(0xFFFFC15E)
 val SolarOrange = Color(0xFFFF8A3D)
 val MutedText = Color(0xFF9AA6D4)

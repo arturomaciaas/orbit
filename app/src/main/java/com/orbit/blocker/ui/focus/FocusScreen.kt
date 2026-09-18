@@ -33,8 +33,11 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +56,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.orbit.blocker.data.model.NotificationTier
 import com.orbit.blocker.domain.block.DurationFormatter
 import com.orbit.blocker.domain.focus.FocusTimer
-import com.orbit.blocker.service.FocusSessionService
 import com.orbit.blocker.ui.components.GlassCard
 import com.orbit.blocker.ui.components.GlassPill
 import com.orbit.blocker.ui.components.SectionLabel
@@ -61,35 +63,48 @@ import com.orbit.blocker.ui.theme.CometCyan
 import com.orbit.blocker.ui.theme.NebulaViolet
 import com.orbit.blocker.ui.theme.StarWhite
 import kotlinx.coroutines.delay
-import java.util.concurrent.TimeUnit
 
 @Composable
 fun FocusScreen(viewModel: FocusViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // The active-session experience takes over the whole screen.
-    AnimatedVisibility(visible = state.session.active, enter = fadeIn(), exit = fadeOut()) {
-        ActiveSession(
-            endsAt = state.session.endsAt ?: 0L,
-            startedAt = state.session.startedAt ?: 0L,
-            blockedCount = state.session.blockedPackages.size,
-        )
+    // React to one-shot start outcomes (e.g. nothing to block).
+    LaunchedEffect(Unit) {
+        viewModel.startEvents.collect { event ->
+            when (event) {
+                is FocusStartEvent.NoAppsToBlock -> snackbarHostState.showSnackbar(
+                    "No apps to block — every app is on the allow-list, or the app list couldn't be read.",
+                )
+                is FocusStartEvent.Started -> { /* the active-session UI takes over automatically */ }
+            }
+        }
     }
 
-    if (!state.session.active) {
-        SetupContent(
-            state = state,
-            onAddAllowed = viewModel::addAllowedApp,
-            onRemoveAllowed = viewModel::removeAllowedApp,
-            onSetTier = viewModel::setNotificationTier,
-            onStart = { minutes ->
-                FocusSessionService.start(
-                    context = context,
-                    packages = state.blockedPackages(),
-                    durationMillis = TimeUnit.MINUTES.toMillis(minutes.toLong()),
-                )
-            },
+    Box(modifier = Modifier.fillMaxSize()) {
+        // The active-session experience takes over the whole screen.
+        AnimatedVisibility(visible = state.session.active, enter = fadeIn(), exit = fadeOut()) {
+            ActiveSession(
+                endsAt = state.session.endsAt ?: 0L,
+                startedAt = state.session.startedAt ?: 0L,
+                blockedCount = state.session.blockedPackages.size,
+            )
+        }
+
+        if (!state.session.active) {
+            SetupContent(
+                state = state,
+                onAddAllowed = viewModel::addAllowedApp,
+                onRemoveAllowed = viewModel::removeAllowedApp,
+                onSetTier = viewModel::setNotificationTier,
+                onStart = { minutes -> viewModel.startSession(context, minutes) },
+            )
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
         )
     }
 }
@@ -184,9 +199,10 @@ private fun SetupContent(
             }
         }
 
-        // Section 4: start button.
+        // Section 4: start button. Disabled until the installed-app list has loaded, so a
+        // session can never start with an empty (blocks-nothing) package set.
         Spacer(Modifier.height(24.dp))
-        StartButton(onClick = { onStart(minutes) })
+        StartButton(enabled = !state.loading, onClick = { onStart(minutes) })
         Spacer(Modifier.height(24.dp))
     }
 
@@ -247,20 +263,25 @@ private fun AllowedAppRow(
 }
 
 @Composable
-private fun StartButton(onClick: () -> Unit) {
+private fun StartButton(enabled: Boolean, onClick: () -> Unit) {
     val shape = RoundedCornerShape(50)
+    val gradient = if (enabled) {
+        Brush.horizontalGradient(listOf(CometCyan, NebulaViolet))
+    } else {
+        Brush.horizontalGradient(listOf(CometCyan.copy(alpha = 0.4f), NebulaViolet.copy(alpha = 0.4f)))
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = 520.dp)
             .clip(shape)
-            .background(Brush.horizontalGradient(listOf(CometCyan, NebulaViolet)), shape)
-            .clickable(onClick = onClick)
+            .background(gradient, shape)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(vertical = 16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            "Start focus session",
+            if (enabled) "Start focus session" else "Loading apps…",
             style = MaterialTheme.typography.titleMedium,
             color = Color.Black,
             fontWeight = FontWeight.SemiBold,

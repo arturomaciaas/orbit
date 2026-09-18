@@ -34,9 +34,12 @@ import com.orbit.blocker.domain.quiz.QuizResult
 import com.orbit.blocker.domain.quiz.displayName
 import com.orbit.blocker.ui.components.GlassProgressBar
 import com.orbit.blocker.ui.components.SpaceBackground
+import com.orbit.blocker.ui.theme.AuroraGreen
 import com.orbit.blocker.ui.theme.CometCyan
 import com.orbit.blocker.ui.theme.GlassBorder
 import com.orbit.blocker.ui.theme.GlassFill
+import com.orbit.blocker.ui.theme.MeteorRed
+import com.orbit.blocker.ui.theme.NebulaTeal
 import com.orbit.blocker.ui.theme.NebulaViolet
 
 /**
@@ -94,6 +97,7 @@ fun QuizGateScreen(
                 state = s,
                 appLabel = appLabel,
                 onSelect = viewModel::select,
+                onSubmit = viewModel::submitAnswer,
                 onNext = viewModel::next,
                 onQuickAccess = onQuickAccess,
             )
@@ -114,6 +118,7 @@ private fun QuizInProgress(
     state: QuizGateState.InProgress,
     appLabel: String?,
     onSelect: (Int) -> Unit,
+    onSubmit: () -> Unit,
     onNext: () -> Unit,
     onQuickAccess: () -> Unit,
 ) {
@@ -151,16 +156,43 @@ private fun QuizInProgress(
             ChoiceCard(
                 text = choice,
                 selected = state.selectedIndex == index,
-                onClick = { onSelect(index) },
+                revealed = state.revealed,
+                isCorrect = index == state.correctIndex,
+                isWrongPick = state.revealed && state.selectedIndex == index && index != state.correctIndex,
+                // Once revealed the answer is locked, so selection taps are ignored.
+                onClick = { if (!state.revealed) onSelect(index) },
             )
         }
 
-        Button(
-            onClick = onNext,
-            enabled = state.selectedIndex != null,
-            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
-        ) {
-            Text(if (state.isLast) "Submit" else "Next")
+        // Explanation is shown only after submitting a wrong answer, to teach the correct one.
+        val explanation = state.question.explanation
+        if (state.answeredWrong && !explanation.isNullOrBlank()) {
+            Text(
+                explanation,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            )
+        }
+
+        if (!state.revealed) {
+            // Phase 1: an answer is selected but not yet submitted.
+            Button(
+                onClick = onSubmit,
+                enabled = state.selectedIndex != null,
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+            ) {
+                Text("Submit")
+            }
+        } else {
+            // Phase 2: answer revealed; advance to the next question or finish the quiz.
+            Button(
+                onClick = onNext,
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+            ) {
+                Text(if (state.isLast) "Finish" else "Next")
+            }
         }
 
         QuickAccessButton(onQuickAccess = onQuickAccess)
@@ -194,18 +226,52 @@ private fun QuickAccessButton(onQuickAccess: () -> Unit) {
     }
 }
 
+/**
+ * A single answer choice.
+ *
+ * Two visual phases:
+ *  - Before submit ([revealed] = false): tapping selects; the selected choice shows the
+ *    cyan→violet gradient.
+ *  - After submit ([revealed] = true): the correct choice is highlighted green and the
+ *    user's incorrect pick (if any) is highlighted red. Other choices dim to neutral.
+ */
 @Composable
-private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
+private fun ChoiceCard(
+    text: String,
+    selected: Boolean,
+    revealed: Boolean,
+    isCorrect: Boolean,
+    isWrongPick: Boolean,
+    onClick: () -> Unit,
+) {
     val shape = RoundedCornerShape(16.dp)
+
+    // A choice reads "solid" (dark text on a bright fill) when it's the selected pick before
+    // reveal, or when it's flagged correct/wrong after reveal.
+    val solid = when {
+        revealed -> isCorrect || isWrongPick
+        else -> selected
+    }
     val textColor by animateColorAsState(
-        if (selected) Color.Black else MaterialTheme.colorScheme.onSurface,
+        if (solid) Color.Black else MaterialTheme.colorScheme.onSurface,
         tween(200),
         label = "choiceText",
     )
-    val fill = if (selected) {
-        Brush.horizontalGradient(listOf(CometCyan.copy(alpha = 0.95f), NebulaViolet.copy(alpha = 0.95f)))
-    } else {
-        Brush.horizontalGradient(listOf(GlassFill.copy(alpha = 0.10f), GlassFill.copy(alpha = 0.06f)))
+    val fill = when {
+        revealed && isCorrect ->
+            Brush.horizontalGradient(listOf(AuroraGreen.copy(alpha = 0.95f), NebulaTeal.copy(alpha = 0.95f)))
+        revealed && isWrongPick ->
+            Brush.horizontalGradient(listOf(MeteorRed.copy(alpha = 0.95f), MeteorRed.copy(alpha = 0.80f)))
+        !revealed && selected ->
+            Brush.horizontalGradient(listOf(CometCyan.copy(alpha = 0.95f), NebulaViolet.copy(alpha = 0.95f)))
+        else ->
+            Brush.horizontalGradient(listOf(GlassFill.copy(alpha = 0.10f), GlassFill.copy(alpha = 0.06f)))
+    }
+    val borderColor = when {
+        revealed && isCorrect -> AuroraGreen.copy(alpha = 0.7f)
+        revealed && isWrongPick -> MeteorRed.copy(alpha = 0.7f)
+        selected -> GlassBorder.copy(alpha = 0.5f)
+        else -> GlassBorder.copy(alpha = 0.2f)
     }
     Box(
         modifier = Modifier
@@ -213,11 +279,8 @@ private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
             .padding(vertical = 6.dp)
             .clip(shape)
             .background(fill, shape)
-            .border(
-                BorderStroke(1.dp, GlassBorder.copy(alpha = if (selected) 0.5f else 0.2f)),
-                shape,
-            )
-            .selectable(selected = selected, onClick = onClick),
+            .border(BorderStroke(1.dp, borderColor), shape)
+            .selectable(selected = selected, enabled = !revealed, onClick = onClick),
     ) {
         Text(
             text,

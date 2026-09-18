@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Legacy Auto Backup rules for Android 11 and below (paired with android:fullBackupContent).
+  Orbit's state is device-local by design and must not be backed up or restored; excluding
+  everything ensures an uninstall is a true reset. See data_extraction_rules.xml for the
+  Android 12+ equivalent covering cloud backup and device transfer.
+-->
+<full-backup-content>
+    <exclude domain="root" />
+    <exclude domain="file" />
+    <exclude domain="database" />
+    <exclude domain="sharedpref" />
+    <exclude domain="external" />
+</full-backup-content>
