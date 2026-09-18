@@ -113,7 +113,14 @@ fun SolarSystemCanvas(
     // Freeze the doomed planet's angle when the impact sequence begins, so the meteor aims true.
     val frozenAngle = remember { mutableFloatStateOf(0f) }
     val frozen = remember { androidx.compose.runtime.mutableStateOf(false) }
-    if (impactProgress <= 0f) frozen.value = false
+    // Last known screen position of the doomed planet. Retained so the meteor + explosion keep
+    // rendering at the impact point during the blast phase, even after the planet row has been
+    // deleted from [planets] (at which point bySlot no longer contains it).
+    val lastDoomedPos = remember { androidx.compose.runtime.mutableStateOf<Offset?>(null) }
+    if (impactProgress <= 0f) {
+        frozen.value = false
+        lastDoomedPos.value = null
+    }
 
     Canvas(modifier = modifier) {
         val center = Offset(size.width / 2f, size.height / 2f)
@@ -123,8 +130,6 @@ fun SolarSystemCanvas(
         drawStar(center, unit * 0.10f, time)
 
         val bySlot = planets.associateBy { it.slot }
-        var doomedPos: Offset? = null
-        var doomedVisual: PlanetVisual? = null
 
         for (slot in 0 until slots) {
             val orbitR = unit * (0.20f + 0.030f * slot)
@@ -151,8 +156,7 @@ fun SolarSystemCanvas(
             val visual = PlanetVisual.forType(planet.type)
 
             if (isDoomed) {
-                doomedPos = pos
-                doomedVisual = visual
+                lastDoomedPos.value = pos
                 // Draw the doomed planet with a pre-impact shake + reddening as the meteor nears.
                 drawDoomedPlanet(pos, unit, visual, time, impactProgress)
             } else {
@@ -160,9 +164,12 @@ fun SolarSystemCanvas(
             }
         }
 
-        // The targeted meteor + explosion, aimed at the doomed planet.
-        if (doomedPos != null && impactProgress > 0f) {
-            drawTargetedMeteor(doomedPos, impactProgress)
+        // The targeted meteor + explosion, aimed at the doomed planet's (last known) position.
+        // Using the retained position means the explosion still plays after the planet row is
+        // gone, instead of silently disappearing at the moment of deletion.
+        val target = lastDoomedPos.value
+        if (target != null && impactProgress > 0f) {
+            drawTargetedMeteor(target, impactProgress)
         }
     }
 }
@@ -327,27 +334,128 @@ private fun DrawScope.drawPlanetMoons(center: Offset, radius: Float, count: Int,
 // endregion
 
 // region star + system planet
+/**
+ * The central star of a solar system. Rather than a flat disc it is built from several
+ * animated layers so it reads as a living star:
+ *  - a soft two-tone corona haze that breathes,
+ *  - a ring of tapered corona rays that rotate and flicker independently,
+ *  - a couple of looping solar-flare prominences arcing off the limb,
+ *  - a white-hot core with a warm limb and a drifting bright spot for surface shimmer.
+ */
 private fun DrawScope.drawStar(center: Offset, radius: Float, time: Float) {
     val pulse = 1f + 0.05f * sin(time * 2f)
-    // Corona glow.
+    val bodyR = radius * pulse
+
+    // --- Corona haze: two stacked radial gradients for depth. ---
     drawCircle(
         brush = Brush.radialGradient(
-            listOf(SolarGold.copy(alpha = 0.45f), Color.Transparent),
+            listOf(SolarOrange.copy(alpha = 0.22f), Color.Transparent),
             center = center,
-            radius = radius * 3f * pulse,
+            radius = radius * 3.4f * pulse,
         ),
-        radius = radius * 3f * pulse,
+        radius = radius * 3.4f * pulse,
         center = center,
     )
-    // Hot core.
     drawCircle(
         brush = Brush.radialGradient(
-            listOf(Color.White, SolarGold, SolarOrange.copy(alpha = 0.9f)),
+            listOf(SolarGold.copy(alpha = 0.5f), SolarOrange.copy(alpha = 0.18f), Color.Transparent),
             center = center,
-            radius = radius * pulse,
+            radius = radius * 2.3f * pulse,
         ),
-        radius = radius * pulse,
+        radius = radius * 2.3f * pulse,
         center = center,
+    )
+
+    // --- Corona rays: tapered spikes fanning out, slowly rotating, each flickering. ---
+    val rayCount = 16
+    val baseAngle = time * 0.15f
+    for (i in 0 until rayCount) {
+        val a = baseAngle + i * (6.2831855f / rayCount)
+        // Independent shimmer per ray so the crown flickers rather than pulsing as one.
+        val flicker = 0.55f + 0.45f * sin(time * 3f + i * 1.7f)
+        val len = radius * (1.6f + 0.9f * flicker)
+        val half = radius * 0.10f // angular half-width of the spike base
+        val cosA = cos(a)
+        val sinA = sin(a)
+        val perpX = -sinA
+        val perpY = cosA
+        val baseX = center.x + cosA * bodyR * 0.9f
+        val baseY = center.y + sinA * bodyR * 0.9f
+        val tipX = center.x + cosA * (bodyR + len)
+        val tipY = center.y + sinA * (bodyR + len)
+        val ray = Path().apply {
+            moveTo(baseX + perpX * half, baseY + perpY * half)
+            lineTo(tipX, tipY)
+            lineTo(baseX - perpX * half, baseY - perpY * half)
+            close()
+        }
+        drawPath(
+            path = ray,
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    SolarGold.copy(alpha = 0.55f * flicker),
+                    SolarOrange.copy(alpha = 0.20f * flicker),
+                    Color.Transparent,
+                ),
+                start = Offset(baseX, baseY),
+                end = Offset(tipX, tipY),
+            ),
+        )
+    }
+
+    // --- Solar flares: a few looping prominence arcs that rise and fall off the limb. ---
+    val flareCount = 3
+    for (i in 0 until flareCount) {
+        val a = time * 0.4f + i * (6.2831855f / flareCount)
+        // Each flare swells and recedes so they feel like they erupt and settle.
+        val swell = 0.5f + 0.5f * sin(time * 1.3f + i * 2.1f)
+        val reach = radius * (0.7f + 1.1f * swell)
+        val cosA = cos(a)
+        val sinA = sin(a)
+        // Foot points sit slightly apart on the limb; the arc bows outward between them.
+        val spread = 0.5f
+        val f1 = Offset(center.x + cos(a - spread) * bodyR, center.y + sin(a - spread) * bodyR)
+        val f2 = Offset(center.x + cos(a + spread) * bodyR, center.y + sin(a + spread) * bodyR)
+        val apex = Offset(center.x + cosA * (bodyR + reach), center.y + sinA * (bodyR + reach))
+        val flare = Path().apply {
+            moveTo(f1.x, f1.y)
+            quadraticBezierTo(apex.x, apex.y, f2.x, f2.y)
+        }
+        drawPath(
+            path = flare,
+            brush = Brush.linearGradient(
+                colors = listOf(SolarOrange.copy(alpha = 0.9f * swell), SolarGold.copy(alpha = 0.4f * swell)),
+                start = f1,
+                end = apex,
+            ),
+            style = Stroke(width = radius * 0.09f),
+        )
+    }
+
+    // --- Star body: warm limb fading to a white-hot core. ---
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color.White, SolarGold, SolarOrange, SolarOrange.copy(alpha = 0.85f)),
+            center = center,
+            radius = bodyR,
+        ),
+        radius = bodyR,
+        center = center,
+    )
+
+    // --- Surface shimmer: an off-center bright spot that drifts, hinting at rotation. ---
+    val hotspot = Offset(
+        center.x + cos(time * 0.6f) * bodyR * 0.28f,
+        center.y + sin(time * 0.6f) * bodyR * 0.28f,
+    )
+    drawCircle(
+        brush = Brush.radialGradient(
+            listOf(Color.White.copy(alpha = 0.8f), Color.Transparent),
+            center = hotspot,
+            radius = bodyR * 0.7f,
+        ),
+        radius = bodyR * 0.7f,
+        center = hotspot,
     )
 }
 

@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.media.AudioManager
 import android.view.accessibility.AccessibilityEvent
+import android.view.inputmethod.InputMethodManager
 import com.orbit.blocker.domain.block.BlockEnforcer
 import com.orbit.blocker.domain.block.CallStateGate
 import com.orbit.blocker.gate.QuizGateActivity
@@ -40,6 +41,12 @@ class OrbitAccessibilityService : AccessibilityService() {
     private var lastEventAt: Long = 0L
     @Volatile private var gatePending: Boolean = false
 
+    // Packages of enabled input methods (keyboards like Gboard). Their windows fire
+    // TYPE_WINDOW_STATE_CHANGED with the IME's own package, which must NEVER be gated — a
+    // keyboard popping up over an allowed app (e.g. tapping WhatsApp's text field) is not an
+    // app switch. Cached because the enabled-IME set rarely changes; refreshed on connect.
+    @Volatile private var imePackages: Set<String> = emptySet()
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         val entryPoint = EntryPointAccessors.fromApplication(
@@ -48,6 +55,26 @@ class OrbitAccessibilityService : AccessibilityService() {
         )
         blockEnforcer = entryPoint.blockEnforcer()
         blockEnforcer.startObserving()
+        imePackages = loadInputMethodPackages()
+    }
+
+    /** Package names of every enabled input method (keyboard) on the device. */
+    private fun loadInputMethodPackages(): Set<String> = runCatching {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            ?: return@runCatching emptySet()
+        imm.enabledInputMethodList
+            .mapNotNull { it.packageName }
+            .toSet()
+    }.getOrDefault(emptySet())
+
+    /**
+     * True if [pkg] is an enabled input method. If the cached set is empty (e.g. the IME
+     * framework wasn't ready at connect time), refresh once before deciding so a keyboard is
+     * never gated on a cold cache.
+     */
+    private fun isInputMethod(pkg: String): Boolean {
+        if (imePackages.isEmpty()) imePackages = loadInputMethodPackages()
+        return pkg in imePackages
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -57,6 +84,12 @@ class OrbitAccessibilityService : AccessibilityService() {
         val pkg = event.packageName?.toString() ?: return
         // Skip our own app so the gate/back-to-home flow doesn't loop.
         if (pkg == packageName) return
+
+        // Skip input methods (keyboards). An IME window opening over the current app fires a
+        // window-state-change carrying the IME's package; that is not an app switch and must
+        // never be gated. Lazily (re)load the set in case it was empty when the service
+        // connected or the user enabled a new keyboard since.
+        if (isInputMethod(pkg)) return
 
         val now = System.currentTimeMillis()
         if (pkg == lastPackage && now - lastEventAt < DEBOUNCE_MS) return

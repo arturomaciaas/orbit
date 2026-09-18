@@ -21,9 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,12 +66,19 @@ fun DeveloperScreen(onBack: () -> Unit) {
     val stage = PlanetStage.entries[stageIndex.coerceAtMost(planetType.finalStage.ordinal)]
     val visual = remember(planetType) { PlanetVisual.forType(planetType) }
 
-    // Mock completed-planet list for the solar-system preview (assorted types).
-    val mockPlanets = remember(systemPlanetCount) {
+    // Mock completed-planet list for the solar-system preview (assorted types). Held as
+    // mutable state so a meteor can remove the *specific* planet it struck (by id), rather
+    // than just trimming the highest slot.
+    val mockPlanets = remember { mutableStateListOf<CompletedPlanet>() }
+    // (Re)build the list whenever the requested count changes, preserving slot/type layout.
+    LaunchedEffect(systemPlanetCount) {
         val types = PlanetType.entries
-        (0 until systemPlanetCount).map { slot ->
-            CompletedPlanet(id = slot.toLong(), systemIndex = 0, slot = slot, type = types[slot % types.size])
-        }
+        mockPlanets.clear()
+        mockPlanets.addAll(
+            (0 until systemPlanetCount).map { slot ->
+                CompletedPlanet(id = slot.toLong(), systemIndex = 0, slot = slot, type = types[slot % types.size])
+            },
+        )
     }
 
     val meteor = remember { Animatable(0f) }
@@ -226,11 +235,16 @@ fun DeveloperScreen(onBack: () -> Unit) {
                 onClick = {
                     scope.launch {
                         if (cosmosView == CosmosView.SOLAR_SYSTEM && mockPlanets.isNotEmpty()) {
-                            // Target a random mock planet, fly in, explode, then drop it.
-                            doomedId = mockPlanets.random().id
+                            // Destroy in order: target the outermost (highest-slot) planet,
+                            // fly in, explode, then drop that exact planet (by id) so the one
+                            // that was struck is always the one removed.
+                            val victimId = mockPlanets.maxByOrNull { it.slot }!!.id
+                            doomedId = victimId
                             meteor.snapTo(0f)
                             meteor.animateTo(com.orbit.blocker.ui.home.IMPACT_FRACTION, tween(750))
-                            if (systemPlanetCount > 0) systemPlanetCount--
+                            mockPlanets.removeAll { it.id == victimId }
+                            // Keep the counter in sync without rebuilding (and thus re-adding) the list.
+                            systemPlanetCount = mockPlanets.size
                             meteor.animateTo(1f, tween(650))
                             meteor.snapTo(0f)
                             doomedId = null

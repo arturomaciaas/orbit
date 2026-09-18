@@ -82,17 +82,33 @@ fun FocusScreen(viewModel: FocusViewModel = hiltViewModel()) {
         }
     }
 
+    val endsAt = state.session.endsAt ?: 0L
+
+    // The service normally ends a session (flipping session.active off) when the timer hits
+    // zero. But if the service process was killed and restored, or the app is reopened with a
+    // session that expires while this screen is open, that flip may not arrive — leaving the
+    // dial frozen on "expired". So the UI treats the countdown reaching zero as authoritative:
+    // once complete, we drop the active view and return to setup on our own.
+    var timerComplete by remember(endsAt) {
+        mutableStateOf(state.session.active && FocusTimer.isComplete(endsAt, System.currentTimeMillis()))
+    }
+    val showActive = state.session.active && !timerComplete
+
     Box(modifier = Modifier.fillMaxSize()) {
         // The active-session experience takes over the whole screen.
-        AnimatedVisibility(visible = state.session.active, enter = fadeIn(), exit = fadeOut()) {
+        AnimatedVisibility(visible = showActive, enter = fadeIn(), exit = fadeOut()) {
             ActiveSession(
-                endsAt = state.session.endsAt ?: 0L,
+                endsAt = endsAt,
                 startedAt = state.session.startedAt ?: 0L,
                 blockedCount = state.session.blockedPackages.size,
+                onComplete = {
+                    timerComplete = true
+                    viewModel.onSessionTimerExpired()
+                },
             )
         }
 
-        if (!state.session.active) {
+        if (!showActive) {
             SetupContent(
                 state = state,
                 onAddAllowed = viewModel::addAllowedApp,
@@ -149,12 +165,11 @@ private fun SetupContent(
             onMinutesChange = { minutes = it },
             diameter = 260.dp,
         )
-        Text(
-            "Drag the ring",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp),
-        )
+
+        // Start button sits directly under the dial. Disabled until the installed-app list
+        // has loaded, so a session can never start with an empty (blocks-nothing) package set.
+        Spacer(Modifier.height(8.dp))
+        StartButton(enabled = !state.loading, onClick = { onStart(minutes) })
 
         // Section 2: apps that stay open (the allow-list).
         Spacer(Modifier.height(24.dp))
@@ -199,10 +214,6 @@ private fun SetupContent(
             }
         }
 
-        // Section 4: start button. Disabled until the installed-app list has loaded, so a
-        // session can never start with an empty (blocks-nothing) package set.
-        Spacer(Modifier.height(24.dp))
-        StartButton(enabled = !state.loading, onClick = { onStart(minutes) })
         Spacer(Modifier.height(24.dp))
     }
 
@@ -302,9 +313,10 @@ private fun ActiveSession(
     endsAt: Long,
     startedAt: Long,
     blockedCount: Int,
+    onComplete: () -> Unit,
 ) {
     var now by remember { mutableStateOf(System.currentTimeMillis()) }
-    LaunchedEffectTicker(endsAt) { now = it }
+    LaunchedEffectTicker(endsAt, onTick = { now = it }, onComplete = onComplete)
 
     val remaining = FocusTimer.remainingMillis(endsAt, now)
     val progress = FocusTimer.progressFraction(startedAt, endsAt, now)
@@ -355,7 +367,7 @@ private fun ActiveSession(
             color = StarWhite,
         )
         Text(
-            "Opening a blocked app triggers the quiz gate. There's no way out until the timer ends — stay in orbit.",
+            "Amaze, amaze, amaze!",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -364,14 +376,22 @@ private fun ActiveSession(
     }
 }
 
-/** Ticks [onTick] with the current time every second until the session ends. */
+/**
+ * Ticks [onTick] with the current time every second until the session ends, then fires
+ * [onComplete] exactly once. [onComplete] lets the screen fall back to setup even if the
+ * session's own "active" flag never flips (e.g. the countdown expired while the service
+ * wasn't around to end it).
+ */
 @Composable
-private fun LaunchedEffectTicker(endsAt: Long, onTick: (Long) -> Unit) {
+private fun LaunchedEffectTicker(endsAt: Long, onTick: (Long) -> Unit, onComplete: () -> Unit) {
     androidx.compose.runtime.LaunchedEffect(endsAt) {
         while (true) {
             val current = System.currentTimeMillis()
             onTick(current)
-            if (FocusTimer.isComplete(endsAt, current)) break
+            if (FocusTimer.isComplete(endsAt, current)) {
+                onComplete()
+                break
+            }
             delay(1_000)
         }
     }

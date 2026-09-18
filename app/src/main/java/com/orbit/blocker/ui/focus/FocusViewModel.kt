@@ -8,6 +8,7 @@ import com.orbit.blocker.data.apps.InstalledAppsProvider
 import com.orbit.blocker.data.model.BlockedApp
 import com.orbit.blocker.data.model.NotificationTier
 import com.orbit.blocker.data.repository.BlockRepository
+import com.orbit.blocker.domain.focus.FocusController
 import com.orbit.blocker.domain.focus.FocusFavorites
 import com.orbit.blocker.domain.focus.FocusSessionManager
 import com.orbit.blocker.domain.focus.FocusSessionState
@@ -66,6 +67,7 @@ class FocusViewModel @Inject constructor(
     private val blockRepository: BlockRepository,
     private val installedAppsProvider: InstalledAppsProvider,
     private val focusSessionManager: FocusSessionManager,
+    private val focusController: FocusController,
 ) : ViewModel() {
 
     private val installedApps = MutableStateFlow<List<InstalledApp>>(emptyList())
@@ -144,6 +146,17 @@ class FocusViewModel @Inject constructor(
             )
             _startEvents.emit(FocusStartEvent.Started(blocked.size))
         }
+    }
+
+    /**
+     * Called by the UI when the countdown reaches zero. Normally the foreground service ends
+     * the session, but if it was killed and restored (or the app was reopened as the timer
+     * expired) that never happens and the screen would stay stuck on "expired". [complete] is
+     * idempotent — it no-ops if the session is already inactive — so calling it here safely
+     * finishes the session, records it, and grows the cosmos when the service missed it.
+     */
+    fun onSessionTimerExpired() {
+        viewModelScope.launch { focusController.complete() }
     }
 
     /** Loads installed apps and, on first run, seeds the allow-list with default favorites. */

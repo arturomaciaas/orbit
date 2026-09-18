@@ -49,20 +49,32 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     // and the setback (planet view) impact renderers.
     val meteor = remember { Animatable(0f) }
 
+    // The planet the meteor is currently striking, held locally for the full duration of the
+    // animation. This is DECOUPLED from progress.doomedPlanetId on purpose: onMeteorImpact()
+    // clears doomedPlanetId in the same save that deletes the planet row, and those two
+    // updates reach the UI on independent flows. If the canvas keyed off doomedPlanetId, the
+    // id could clear a frame before the deleted planet dropped out of systemPlanets — so the
+    // struck planet would flicker back to life at its live orbit while a *different* (still
+    // present) planet appeared to take the hit. Owning the id here keeps the target stable.
+    var animatingDoomedId by remember { mutableStateOf<Long?>(null) }
+
     // A planet marked for destruction: fly a meteor at it in the SYSTEM view, then remove it
     // at impact. Keyed on the doomed id so a fresh strike restarts the sequence.
     LaunchedEffect(progress.doomedPlanetId) {
         val doomed = progress.doomedPlanetId
         if (doomed != null) {
             view = CosmosView.SOLAR_SYSTEM // make sure the user witnesses the nuke
+            animatingDoomedId = doomed
             meteor.snapTo(0f)
             // Approach phase.
             meteor.animateTo(IMPACT_FRACTION, animationSpec = tween(750))
             // Impact: remove the planet now so the explosion replaces it.
             viewModel.onMeteorImpact()
-            // Blast phase.
+            // Blast phase — keep targeting the same id so the explosion stays put and the
+            // struck planet never reappears while systemPlanets catches up to the deletion.
             meteor.animateTo(1f, animationSpec = tween(650))
             meteor.snapTo(0f)
+            animatingDoomedId = null
         }
     }
 
@@ -106,8 +118,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
         ViewSwitcher(view = view, onSelect = { view = it })
 
         // The animated scene sits directly on the space backdrop (no card) for max impact.
+        // Scaled to 95% so the tab fits on screen without scrolling.
         Box(
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
             when (view) {
@@ -120,8 +135,8 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 )
                 CosmosView.SOLAR_SYSTEM -> SolarSystemCanvas(
                     planets = systemPlanets,
-                    doomedPlanetId = progress.doomedPlanetId,
-                    impactProgress = if (progress.doomedPlanetId != null) meteor.value else 0f,
+                    doomedPlanetId = animatingDoomedId,
+                    impactProgress = if (animatingDoomedId != null) meteor.value else 0f,
                     modifier = Modifier.fillMaxSize(),
                 )
                 CosmosView.GALAXY -> GalaxyCanvas(
@@ -229,7 +244,7 @@ private fun cosmosTitle(view: CosmosView, progress: GalaxyProgress, planetTitle:
 
 private fun cosmosSubtitle(view: CosmosView, progress: GalaxyProgress): String =
     when (view) {
-        CosmosView.PLANET -> "Growing now — ${stageLabel(progress.stage)}"
+        CosmosView.PLANET -> "Growing now: ${stageLabel(progress.stage)}"
         CosmosView.SOLAR_SYSTEM -> "Complete 8 planets to ignite this system"
         CosmosView.GALAXY -> "Each completed system becomes a star"
     }
