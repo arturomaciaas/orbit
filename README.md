@@ -14,7 +14,7 @@
   <img alt="Hilt" src="https://img.shields.io/badge/Hilt-FF7043" />
 </p>
 
-<img src="docs/assets/hero.png" alt="Orbit home screen" width="280" />
+<img src="docs/assets/video.gif" alt="Orbit walkthrough" width="280" />
 
 </div>
 
@@ -27,6 +27,10 @@ I made it with the goal of spending less time on my phone so I can study more an
 ## How it works
 
 When you open a blocked app, Orbit intercepts it and asks you quiz questions before letting you in. Focus sessions grow an animated cosmos. Wrong answers trigger a meteor strike that sets you back. Noisy app notifications get sorted into tiers so only what matters reaches you. Quiz questions include the following topics: [software engineering, system design, AWS, chess].
+
+<div align="center">
+<img src="docs/assets/question.jpg" alt="A question from Orbit" width="280" />
+</div>
 
 ## Tech
 
@@ -48,3 +52,9 @@ cd orbit
 ```
 
 Requirements: JDK 17, Android SDK 35, a device on Android 12+ (API 31).
+
+## See the cosmos:
+
+<div align="center">
+<img src="docs/assets/cosmos.gif" alt="What the cosmos look like" width="280" />
+</div>
