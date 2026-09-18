@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "key": "sd-read-replicas",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "Which technique most directly reduces read load on a primary database?",
+      "choices": ["Read replicas", "Increasing the primary's disk size", "Adding more application servers", "Using a stronger password policy"],
+      "correctIndex": 0,
+      "explanation": "Read replicas serve read traffic, offloading the primary and improving read scalability."
+    },
+    {
+      "key": "sd-load-balancer-purpose",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is the main purpose of a load balancer?",
+      "choices": ["Encrypt data at rest", "Distribute incoming requests across servers", "Compress images", "Store session cookies"],
+      "correctIndex": 1,
+      "explanation": "A load balancer spreads traffic across backends to improve availability and utilization."
+    },
+    {
+      "key": "sd-cap-theorem-partition",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "In the CAP theorem, a network partition forces a system to choose between which two properties?",
+      "choices": ["Consistency and Availability", "Caching and Persistence", "Concurrency and Atomicity", "Compression and Authentication"],
+      "correctIndex": 0,
+      "explanation": "During a partition (P), a distributed system must trade off Consistency versus Availability."
+    },
+    {
+      "key": "sd-cache-eviction-lru",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "Which cache eviction policy removes the entry unused for the longest time?",
+      "choices": ["FIFO", "LRU", "Random", "Write-through"],
+      "correctIndex": 1,
+      "explanation": "LRU (Least Recently Used) evicts the entry that has gone longest without access."
+    },
+    {
+      "key": "sd-idempotency",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What does idempotency guarantee for an API request?",
+      "choices": ["It always returns cached data", "Repeating it has the same effect as doing it once", "It never fails", "It runs faster each time"],
+      "correctIndex": 1,
+      "explanation": "An idempotent operation can be retried safely; repeats do not change the result beyond the first."
+    },
+    {
+      "key": "sd-message-queue-benefit",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "A message queue between services primarily provides what benefit?",
+      "choices": ["Stronger encryption", "Tighter coupling", "Asynchronous decoupling and buffering", "Lower storage cost"],
+      "correctIndex": 2,
+      "explanation": "Queues decouple producers from consumers and absorb bursts, smoothing load."
+    },
+    {
+      "key": "chess-knight-jumps",
+      "topic": "CHESS",
+      "prompt": "What is the only piece that can jump over other pieces?",
+      "choices": ["Bishop", "Rook", "Knight", "Queen"],
+      "correctIndex": 2,
+      "explanation": "The knight moves in an L-shape and is the only piece that leaps over others."
+    },
+    {
+      "key": "chess-castling-illegal",
+      "topic": "CHESS",
+      "prompt": "Castling is not allowed if which of these is true?",
+      "choices": ["The king has already moved", "It is the endgame", "You have a queen", "Your opponent castled first"],
+      "correctIndex": 0,
+      "explanation": "Castling is illegal if the king (or the involved rook) has moved, or the king is/passes through check."
+    },
+    {
+      "key": "chess-pawn-promotion",
+      "topic": "CHESS",
+      "prompt": "What is the term for a pawn reaching the opponent's back rank?",
+      "choices": ["En passant", "Promotion", "Zugzwang", "Fork"],
+      "correctIndex": 1,
+      "explanation": "A pawn reaching the last rank is promoted, usually to a queen."
+    },
+    {
+      "key": "chess-ruy-lopez",
+      "topic": "CHESS",
+      "prompt": "Which opening begins 1.e4 e5 2.Nf3 Nc6 3.Bb5?",
+      "choices": ["Italian Game", "Ruy Lopez", "Sicilian Defense", "French Defense"],
+      "correctIndex": 1,
+      "explanation": "3.Bb5 characterizes the Ruy Lopez (Spanish Opening)."
+    },
+    {
+      "key": "chess-fork-tactic",
+      "topic": "CHESS",
+      "prompt": "A 'fork' is a tactic where one piece does what?",
+      "choices": ["Blocks a check", "Attacks two or more pieces at once", "Promotes early", "Defends the king"],
+      "correctIndex": 1,
+      "explanation": "A fork attacks multiple targets simultaneously, winning material."
+    },
+    {
+      "key": "chess-zugzwang",
+      "topic": "CHESS",
+      "prompt": "What does 'zugzwang' mean?",
+      "choices": ["A winning sacrifice", "Any move worsens the position", "A drawn endgame", "A double check"],
+      "correctIndex": 1,
+      "explanation": "In zugzwang, a player is forced to move and every option damages their position."
+    },
+    {
+      "key": "se-binary-search-complexity",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is the time complexity of binary search on a sorted array?",
+      "choices": ["O(n)", "O(log n)", "O(n log n)", "O(1)"],
+      "correctIndex": 1,
+      "explanation": "Binary search halves the search space each step, giving O(log n)."
+    },
+    {
+      "key": "se-git-revert",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In Git, which command creates a new commit that undoes a previous commit?",
+      "choices": ["git revert", "git reset --hard", "git rm", "git stash"],
+      "correctIndex": 0,
+      "explanation": "git revert creates a new commit that reverses changes, preserving history."
+    },
+    {
+      "key": "se-solid-single-responsibility",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What does the 'S' in SOLID stand for?",
+      "choices": ["Separation", "Single Responsibility", "Stateless", "Synchronization"],
+      "correctIndex": 1,
+      "explanation": "The Single Responsibility Principle: a class should have one reason to change."
+    },
+    {
+      "key": "se-queue-fifo",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "Which data structure operates first-in, first-out (FIFO)?",
+      "choices": ["Stack", "Queue", "Tree", "Hash map"],
+      "correctIndex": 1,
+      "explanation": "A queue processes elements in the order they were added (FIFO)."
+    },
+    {
+      "key": "se-race-condition",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is a race condition?",
+      "choices": ["A slow algorithm", "A bug from uncontrolled concurrent access to shared state", "A compiler error", "A type mismatch"],
+      "correctIndex": 1,
+      "explanation": "Race conditions arise when concurrent operations interleave over shared state without synchronization."
+    },
+    {
+      "key": "se-immutable-object",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What does an immutable object guarantee?",
+      "choices": ["Its state cannot change after construction", "It uses less memory always", "It is thread-unsafe", "It cannot be garbage collected"],
+      "correctIndex": 0,
+      "explanation": "Immutable objects cannot be modified after creation, which makes them inherently thread-safe to share."
+    },
+    {
+      "key": "aws-s3-object-storage",
+      "topic": "AWS",
+      "prompt": "Which AWS service provides object storage?",
+      "choices": ["Amazon EC2", "Amazon S3", "Amazon RDS", "Amazon VPC"],
+      "correctIndex": 1,
+      "explanation": "Amazon S3 (Simple Storage Service) stores objects in buckets."
+    },
+    {
+      "key": "aws-iam-role",
+      "topic": "AWS",
+      "prompt": "What does an AWS IAM role primarily provide?",
+      "choices": ["A static password", "Temporary permissions assumable by entities", "A billing alert", "A DNS record"],
+      "correctIndex": 1,
+      "explanation": "IAM roles grant temporary credentials that trusted entities can assume."
+    },
+    {
+      "key": "aws-lambda-serverless",
+      "topic": "AWS",
+      "prompt": "Which service runs code without provisioning servers?",
+      "choices": ["AWS Lambda", "Amazon EBS", "Amazon Route 53", "AWS Direct Connect"],
+      "correctIndex": 0,
+      "explanation": "AWS Lambda runs functions on demand without server management (serverless)."
+    },
+    {
+      "key": "aws-rds-managed-relational",
+      "topic": "AWS",
+      "prompt": "Amazon RDS is best described as what?",
+      "choices": ["A managed relational database service", "A CDN", "An object store", "A message queue"],
+      "correctIndex": 0,
+      "explanation": "RDS manages relational databases like PostgreSQL and MySQL, handling patching and backups."
+    },
+    {
+      "key": "aws-auto-scaling-group",
+      "topic": "AWS",
+      "prompt": "What is the purpose of an Auto Scaling group?",
+      "choices": ["Encrypt EBS volumes", "Automatically adjust the number of EC2 instances to demand", "Route DNS globally", "Store secrets"],
+      "correctIndex": 1,
+      "explanation": "Auto Scaling groups add or remove instances based on load or schedules."
+    },
+    {
+      "key": "aws-dynamodb-nosql",
+      "topic": "AWS",
+      "prompt": "Which service is a fully managed NoSQL key-value database?",
+      "choices": ["Amazon DynamoDB", "Amazon Redshift", "AWS Glue", "Amazon Athena"],
+      "correctIndex": 0,
+      "explanation": "DynamoDB is AWS's managed NoSQL key-value and document database."
+    }
+  ]
+}

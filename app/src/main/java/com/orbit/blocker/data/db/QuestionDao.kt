@@ -34,6 +34,22 @@ interface QuestionDao {
     @Query("SELECT * FROM questions")
     suspend fun getAll(): List<Question>
 
+    /** All questions that originate from the bundled seed asset (sourceKey is set). */
+    @Query("SELECT * FROM questions WHERE sourceKey IS NOT NULL")
+    suspend fun getSeededWithSource(): List<Question>
+
+    /** Deletes seeded questions whose [sourceKey] is in [keys] (e.g. withdrawn from the asset). */
+    @Query("DELETE FROM questions WHERE sourceKey IN (:keys)")
+    suspend fun deleteBySourceKeys(keys: List<String>)
+
+    /**
+     * Deletes legacy shipped questions from installs seeded before [Question.sourceKey] existed:
+     * rows marked seeded but with no source key. User-authored rows (seeded = 0) are untouched.
+     * The keyed versions from the asset are re-inserted by the syncer afterwards.
+     */
+    @Query("DELETE FROM questions WHERE seeded = 1 AND sourceKey IS NULL")
+    suspend fun deleteLegacyKeylessSeeded()
+
     @Query("SELECT COUNT(*) FROM questions")
     suspend fun count(): Int
 

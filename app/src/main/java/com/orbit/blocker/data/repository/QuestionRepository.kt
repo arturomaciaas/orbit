@@ -18,6 +18,18 @@ interface QuestionRepository {
     suspend fun seededCount(): Int
     suspend fun addAll(questions: List<Question>)
 
+    /** Seeded questions that carry a [Question.sourceKey] (i.e. came from the bundled asset). */
+    suspend fun seededWithSource(): List<Question>
+
+    /** Removes seeded questions whose source key is in [keys]. User-authored rows are untouched. */
+    suspend fun deleteBySourceKeys(keys: List<String>)
+
+    /** Removes legacy shipped questions (seeded, no source key) from pre-sync installs. */
+    suspend fun deleteLegacyKeylessSeeded()
+
+    /** Inserts or replaces questions, keyed by their unique [Question.sourceKey]. */
+    suspend fun upsertAll(questions: List<Question>)
+
     /** Draws [limit] random questions across [topics] (empty = all topics). */
     suspend fun randomQuestions(limit: Int, topics: List<QuizTopic>): List<Question>
 }
@@ -37,6 +49,16 @@ class QuestionRepositoryImpl @Inject constructor(
     override suspend fun count(): Int = questionDao.count()
     override suspend fun seededCount(): Int = questionDao.seededCount()
     override suspend fun addAll(questions: List<Question>) = questionDao.insertAll(questions)
+
+    override suspend fun seededWithSource(): List<Question> = questionDao.getSeededWithSource()
+
+    override suspend fun deleteBySourceKeys(keys: List<String>) {
+        if (keys.isNotEmpty()) questionDao.deleteBySourceKeys(keys)
+    }
+
+    override suspend fun deleteLegacyKeylessSeeded() = questionDao.deleteLegacyKeylessSeeded()
+
+    override suspend fun upsertAll(questions: List<Question>) = questionDao.insertAll(questions)
 
     override suspend fun randomQuestions(limit: Int, topics: List<QuizTopic>): List<Question> =
         questionDao.randomQuestions(

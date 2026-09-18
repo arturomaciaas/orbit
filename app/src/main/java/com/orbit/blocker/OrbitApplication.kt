@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.orbit.blocker.data.repository.GalaxyRepository
-import com.orbit.blocker.data.seed.QuestionSeeder
+import com.orbit.blocker.data.seed.QuestionSyncer
 import com.orbit.blocker.work.ExpiredRuleCleanupWorker
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class OrbitApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
-    @Inject lateinit var questionSeeder: QuestionSeeder
+    @Inject lateinit var questionSyncer: QuestionSyncer
     @Inject lateinit var galaxyRepository: GalaxyRepository
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -32,9 +32,11 @@ class OrbitApplication : Application(), Configuration.Provider {
         // Backstop cleanup for expired duration blocks and access grants.
         ExpiredRuleCleanupWorker.schedule(this)
 
-        // First-run data setup: seed the quiz bank and ensure the galaxy row exists.
+        // Sync the bundled quiz bank (add/update/remove shipped questions) and ensure the
+        // galaxy row exists. The sync runs every launch so newly-shipped questions land on
+        // existing installs; user-authored questions are left untouched.
         appScope.launch {
-            questionSeeder.seedIfEmpty()
+            questionSyncer.sync()
             galaxyRepository.ensureInitialized()
         }
     }

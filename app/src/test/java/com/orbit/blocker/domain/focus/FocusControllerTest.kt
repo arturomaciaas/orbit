@@ -1,6 +1,7 @@
 package com.orbit.blocker.domain.focus
 
 import com.google.common.truth.Truth.assertThat
+import com.orbit.blocker.data.model.CompletedPlanet
 import com.orbit.blocker.data.model.FocusOutcome
 import com.orbit.blocker.data.model.FocusSessionRecord
 import com.orbit.blocker.data.model.GalaxyProgress
@@ -10,6 +11,7 @@ import com.orbit.blocker.domain.gamification.GamificationEvents
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlin.random.Random
 import org.junit.Test
 
 class FocusControllerTest {
@@ -26,16 +28,27 @@ class FocusControllerTest {
 
     private class FakeGalaxyRepo : GalaxyRepository {
         var progress = GalaxyProgress()
+        val planets = mutableListOf<CompletedPlanet>()
         override fun observe(): Flow<GalaxyProgress> = flowOf(progress)
         override suspend fun get(): GalaxyProgress = progress
         override suspend fun save(progress: GalaxyProgress) { this.progress = progress }
         override suspend fun ensureInitialized() {}
+        override fun observeSystemPlanets(systemIndex: Int): Flow<List<CompletedPlanet>> =
+            flowOf(planets.filter { it.systemIndex == systemIndex })
+        override suspend fun systemPlanets(systemIndex: Int): List<CompletedPlanet> =
+            planets.filter { it.systemIndex == systemIndex }
+        override suspend fun addCompletedPlanet(planet: CompletedPlanet): CompletedPlanet {
+            val stored = planet.copy(id = planets.size.toLong() + 1)
+            planets += stored
+            return stored
+        }
+        override suspend fun removeCompletedPlanet(planet: CompletedPlanet) { planets.remove(planet) }
     }
 
     // Spy over the real GamificationEvents to count completion calls.
     private class SpyGamification : GamificationEvents(FakeGalaxyRepo()) {
         var completedCalls = 0
-        override suspend fun onFocusSessionCompleted(now: Long) { completedCalls++ }
+        override suspend fun onFocusSessionCompleted(now: Long, random: Random) { completedCalls++ }
     }
 
     private fun controller(repo: FakeFocusRepo, gam: SpyGamification, manager: FocusSessionManager) =

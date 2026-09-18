@@ -43,7 +43,10 @@ data class BlockRule(
  */
 @Entity(
     tableName = "questions",
-    indices = [Index("topic")],
+    indices = [
+        Index("topic"),
+        Index(value = ["sourceKey"], unique = true),
+    ],
 )
 data class Question(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -54,6 +57,15 @@ data class Question(
     val explanation: String? = null,
     /** Seeded questions are marked so a "reset bank" can distinguish them from user-authored ones. */
     val seeded: Boolean = false,
+    /**
+     * Stable identifier for questions that originate from the bundled `seed_questions.json`
+     * asset. Null for user-authored questions created in the Quiz Bank screen.
+     *
+     * This key is authored in the JSON (not derived from prompt text) so the seed sync can
+     * add newly-shipped questions, update edited ones, and remove withdrawn ones across app
+     * launches without disturbing user-authored questions or duplicating on prompt edits.
+     */
+    val sourceKey: String? = null,
 )
 
 /**

@@ -23,7 +23,7 @@ import com.orbit.blocker.data.model.Question
         CompletedPlanet::class,
         FocusSessionRecord::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

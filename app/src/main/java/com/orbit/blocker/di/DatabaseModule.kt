@@ -66,11 +66,28 @@ object DatabaseModule {
         }
     }
 
+    /**
+     * v3 -> v4: the quiz bank moved from a one-time Kotlin seed to a bundled JSON asset that
+     * syncs on every launch. Questions gained a nullable [sourceKey] that anchors each shipped
+     * question to its JSON entry (null = user-authored). A unique index on `sourceKey` lets the
+     * sync upsert by key. Existing rows keep sourceKey NULL; the syncer reconciles them by
+     * matching the previously-seeded set against the JSON on the next launch.
+     */
+    private val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `questions` ADD COLUMN `sourceKey` TEXT")
+            db.execSQL(
+                "CREATE UNIQUE INDEX IF NOT EXISTS `index_questions_sourceKey` " +
+                    "ON `questions` (`sourceKey`)"
+            )
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): OrbitDatabase =
         Room.databaseBuilder(context, OrbitDatabase::class.java, OrbitDatabase.NAME)
-            .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
             // Safety net for any other version jump during early dev: recreate rather than crash.
             .fallbackToDestructiveMigration()
             .fallbackToDestructiveMigrationOnDowngrade()
