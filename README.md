@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/logo.png" alt="Orbit logo" width="120" />
+<img src="docs/assets/logo.png" alt="Orbit logo"/>
 
 # 🪐 Orbit
 
@@ -14,7 +14,7 @@
   <img alt="Hilt" src="https://img.shields.io/badge/Hilt-FF7043" />
 </p>
 
-<img src="docs/assets/video.gif" alt="Orbit walkthrough" width="280" />
+<img src="docs/assets/video.gif" alt="Orbit walkthrough"/>
 
 </div>
 
@@ -43,7 +43,7 @@ When you open a blocked app, Orbit intercepts it and asks you quiz questions bef
 ## Build
 
 ```bash
-git clone <https://github.com/arturomaciaas/orbit.git>
+git clone https://github.com/arturomaciaas/orbit.git
 cd orbit
 
 ./gradlew assembleDebug     # build a debug APK
