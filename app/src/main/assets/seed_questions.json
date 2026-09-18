@@ -5,7 +5,12 @@
       "key": "sd-read-replicas",
       "topic": "SYSTEM_DESIGN",
       "prompt": "Which technique most directly reduces read load on a primary database?",
-      "choices": ["Read replicas", "Increasing the primary's disk size", "Adding more application servers", "Using a stronger password policy"],
+      "choices": [
+        "Read replicas",
+        "Increasing the primary's disk size",
+        "Adding more application servers",
+        "Using a stronger password policy"
+      ],
       "correctIndex": 0,
       "explanation": "Read replicas serve read traffic, offloading the primary and improving read scalability."
     },
@@ -13,39 +18,64 @@
       "key": "sd-load-balancer-purpose",
       "topic": "SYSTEM_DESIGN",
       "prompt": "What is the main purpose of a load balancer?",
-      "choices": ["Encrypt data at rest", "Distribute incoming requests across servers", "Compress images", "Store session cookies"],
+      "choices": [
+        "Encrypt data at rest",
+        "Distribute incoming requests across servers",
+        "Compress images",
+        "Store session cookies"
+      ],
       "correctIndex": 1,
       "explanation": "A load balancer spreads traffic across backends to improve availability and utilization."
     },
     {
       "key": "sd-cap-theorem-partition",
       "topic": "SYSTEM_DESIGN",
-      "prompt": "In the CAP theorem, a network partition forces a system to choose between which two properties?",
-      "choices": ["Consistency and Availability", "Caching and Persistence", "Concurrency and Atomicity", "Compression and Authentication"],
+      "prompt": "During a network partition, which two CAP properties must a partition-tolerant system trade off?",
+      "choices": [
+        "Consistency and Availability",
+        "Caching and Persistence",
+        "Concurrency and Atomicity",
+        "Compression and Authentication"
+      ],
       "correctIndex": 0,
-      "explanation": "During a partition (P), a distributed system must trade off Consistency versus Availability."
+      "explanation": "CAP states that during a network partition, a distributed system cannot guarantee both strong consistency and availability. A partition-tolerant system must therefore trade off these two properties."
     },
     {
       "key": "sd-cache-eviction-lru",
       "topic": "SYSTEM_DESIGN",
       "prompt": "Which cache eviction policy removes the entry unused for the longest time?",
-      "choices": ["FIFO", "LRU", "Random", "Write-through"],
+      "choices": [
+        "FIFO",
+        "LRU",
+        "Random",
+        "Write-through"
+      ],
       "correctIndex": 1,
       "explanation": "LRU (Least Recently Used) evicts the entry that has gone longest without access."
     },
     {
       "key": "sd-idempotency",
       "topic": "SYSTEM_DESIGN",
-      "prompt": "What does idempotency guarantee for an API request?",
-      "choices": ["It always returns cached data", "Repeating it has the same effect as doing it once", "It never fails", "It runs faster each time"],
+      "prompt": "What does idempotency mean for an API operation?",
+      "choices": [
+        "It always returns cached data",
+        "Repeating it has the same intended effect as performing it once",
+        "It never fails",
+        "It runs faster each time"
+      ],
       "correctIndex": 1,
-      "explanation": "An idempotent operation can be retried safely; repeats do not change the result beyond the first."
+      "explanation": "An idempotent operation can be repeated without changing its intended effect on the server beyond the first successful application, which makes retries safer."
     },
     {
       "key": "sd-message-queue-benefit",
       "topic": "SYSTEM_DESIGN",
       "prompt": "A message queue between services primarily provides what benefit?",
-      "choices": ["Stronger encryption", "Tighter coupling", "Asynchronous decoupling and buffering", "Lower storage cost"],
+      "choices": [
+        "Stronger encryption",
+        "Tighter coupling",
+        "Asynchronous decoupling and buffering",
+        "Lower storage cost"
+      ],
       "correctIndex": 2,
       "explanation": "Queues decouple producers from consumers and absorb bursts, smoothing load."
     },
@@ -53,7 +83,12 @@
       "key": "chess-knight-jumps",
       "topic": "CHESS",
       "prompt": "What is the only piece that can jump over other pieces?",
-      "choices": ["Bishop", "Rook", "Knight", "Queen"],
+      "choices": [
+        "Bishop",
+        "Rook",
+        "Knight",
+        "Queen"
+      ],
       "correctIndex": 2,
       "explanation": "The knight moves in an L-shape and is the only piece that leaps over others."
     },
@@ -61,15 +96,25 @@
       "key": "chess-castling-illegal",
       "topic": "CHESS",
       "prompt": "Castling is not allowed if which of these is true?",
-      "choices": ["The king has already moved", "It is the endgame", "You have a queen", "Your opponent castled first"],
+      "choices": [
+        "The king has already moved",
+        "It is the endgame",
+        "You have a queen",
+        "Your opponent castled first"
+      ],
       "correctIndex": 0,
-      "explanation": "Castling is illegal if the king (or the involved rook) has moved, or the king is/passes through check."
+      "explanation": "Castling is illegal if the king or the involved rook has moved, or if the king is in check or would pass through or into check."
     },
     {
       "key": "chess-pawn-promotion",
       "topic": "CHESS",
       "prompt": "What is the term for a pawn reaching the opponent's back rank?",
-      "choices": ["En passant", "Promotion", "Zugzwang", "Fork"],
+      "choices": [
+        "En passant",
+        "Promotion",
+        "Zugzwang",
+        "Fork"
+      ],
       "correctIndex": 1,
       "explanation": "A pawn reaching the last rank is promoted, usually to a queen."
     },
@@ -77,79 +122,129 @@
       "key": "chess-ruy-lopez",
       "topic": "CHESS",
       "prompt": "Which opening begins 1.e4 e5 2.Nf3 Nc6 3.Bb5?",
-      "choices": ["Italian Game", "Ruy Lopez", "Sicilian Defense", "French Defense"],
+      "choices": [
+        "Italian Game",
+        "Ruy Lopez",
+        "Sicilian Defense",
+        "French Defense"
+      ],
       "correctIndex": 1,
-      "explanation": "3.Bb5 characterizes the Ruy Lopez (Spanish Opening)."
+      "explanation": "3.Bb5 characterizes the Ruy Lopez, also known as the Spanish Opening."
     },
     {
       "key": "chess-fork-tactic",
       "topic": "CHESS",
       "prompt": "A 'fork' is a tactic where one piece does what?",
-      "choices": ["Blocks a check", "Attacks two or more pieces at once", "Promotes early", "Defends the king"],
+      "choices": [
+        "Blocks a check",
+        "Attacks two or more pieces at once",
+        "Promotes early",
+        "Defends the king"
+      ],
       "correctIndex": 1,
-      "explanation": "A fork attacks multiple targets simultaneously, winning material."
+      "explanation": "A fork attacks multiple targets simultaneously, potentially winning material."
     },
     {
       "key": "chess-zugzwang",
       "topic": "CHESS",
       "prompt": "What does 'zugzwang' mean?",
-      "choices": ["A winning sacrifice", "Any move worsens the position", "A drawn endgame", "A double check"],
+      "choices": [
+        "A winning sacrifice",
+        "Any move worsens the position",
+        "A drawn endgame",
+        "A double check"
+      ],
       "correctIndex": 1,
-      "explanation": "In zugzwang, a player is forced to move and every option damages their position."
+      "explanation": "In zugzwang, a player is forced to move and every legal move worsens their position."
     },
     {
       "key": "se-binary-search-complexity",
       "topic": "SOFTWARE_ENGINEERING",
       "prompt": "What is the time complexity of binary search on a sorted array?",
-      "choices": ["O(n)", "O(log n)", "O(n log n)", "O(1)"],
+      "choices": [
+        "O(n)",
+        "O(log n)",
+        "O(n log n)",
+        "O(1)"
+      ],
       "correctIndex": 1,
-      "explanation": "Binary search halves the search space each step, giving O(log n)."
+      "explanation": "Binary search halves the search space each step, giving O(log n) time complexity."
     },
     {
       "key": "se-git-revert",
       "topic": "SOFTWARE_ENGINEERING",
       "prompt": "In Git, which command creates a new commit that undoes a previous commit?",
-      "choices": ["git revert", "git reset --hard", "git rm", "git stash"],
+      "choices": [
+        "git revert",
+        "git reset --hard",
+        "git rm",
+        "git stash"
+      ],
       "correctIndex": 0,
-      "explanation": "git revert creates a new commit that reverses changes, preserving history."
+      "explanation": "git revert creates a new commit that reverses changes introduced by a previous commit, preserving history."
     },
     {
       "key": "se-solid-single-responsibility",
       "topic": "SOFTWARE_ENGINEERING",
       "prompt": "What does the 'S' in SOLID stand for?",
-      "choices": ["Separation", "Single Responsibility", "Stateless", "Synchronization"],
+      "choices": [
+        "Separation",
+        "Single Responsibility",
+        "Stateless",
+        "Synchronization"
+      ],
       "correctIndex": 1,
-      "explanation": "The Single Responsibility Principle: a class should have one reason to change."
+      "explanation": "The Single Responsibility Principle states that a class or module should have one reason to change."
     },
     {
       "key": "se-queue-fifo",
       "topic": "SOFTWARE_ENGINEERING",
       "prompt": "Which data structure operates first-in, first-out (FIFO)?",
-      "choices": ["Stack", "Queue", "Tree", "Hash map"],
+      "choices": [
+        "Stack",
+        "Queue",
+        "Tree",
+        "Hash map"
+      ],
       "correctIndex": 1,
-      "explanation": "A queue processes elements in the order they were added (FIFO)."
+      "explanation": "A queue processes elements in the order they were added, following the FIFO principle."
     },
     {
       "key": "se-race-condition",
       "topic": "SOFTWARE_ENGINEERING",
       "prompt": "What is a race condition?",
-      "choices": ["A slow algorithm", "A bug from uncontrolled concurrent access to shared state", "A compiler error", "A type mismatch"],
+      "choices": [
+        "A slow algorithm",
+        "A bug where the outcome depends on the timing or interleaving of concurrent operations",
+        "A compiler error",
+        "A type mismatch"
+      ],
       "correctIndex": 1,
-      "explanation": "Race conditions arise when concurrent operations interleave over shared state without synchronization."
+      "explanation": "A race condition occurs when concurrent operations can interleave in different ways, causing the program's behavior or result to depend on their timing."
     },
     {
       "key": "se-immutable-object",
       "topic": "SOFTWARE_ENGINEERING",
       "prompt": "What does an immutable object guarantee?",
-      "choices": ["Its state cannot change after construction", "It uses less memory always", "It is thread-unsafe", "It cannot be garbage collected"],
+      "choices": [
+        "Its state cannot change after construction",
+        "It uses less memory always",
+        "It is thread-unsafe",
+        "It cannot be garbage collected"
+      ],
       "correctIndex": 0,
-      "explanation": "Immutable objects cannot be modified after creation, which makes them inherently thread-safe to share."
+      "explanation": "An immutable object cannot have its state changed after creation. Truly immutable objects can generally be safely shared between threads because concurrent code cannot modify their state."
     },
     {
       "key": "aws-s3-object-storage",
       "topic": "AWS",
       "prompt": "Which AWS service provides object storage?",
-      "choices": ["Amazon EC2", "Amazon S3", "Amazon RDS", "Amazon VPC"],
+      "choices": [
+        "Amazon EC2",
+        "Amazon S3",
+        "Amazon RDS",
+        "Amazon VPC"
+      ],
       "correctIndex": 1,
       "explanation": "Amazon S3 (Simple Storage Service) stores objects in buckets."
     },
@@ -157,41 +252,924 @@
       "key": "aws-iam-role",
       "topic": "AWS",
       "prompt": "What does an AWS IAM role primarily provide?",
-      "choices": ["A static password", "Temporary permissions assumable by entities", "A billing alert", "A DNS record"],
+      "choices": [
+        "A static password",
+        "Permissions that trusted entities can assume, typically using temporary credentials",
+        "A billing alert",
+        "A DNS record"
+      ],
       "correctIndex": 1,
-      "explanation": "IAM roles grant temporary credentials that trusted entities can assume."
+      "explanation": "An IAM role is an identity with permissions that can be assumed by trusted users, applications, or AWS services. Assuming a role provides temporary security credentials."
     },
     {
       "key": "aws-lambda-serverless",
       "topic": "AWS",
       "prompt": "Which service runs code without provisioning servers?",
-      "choices": ["AWS Lambda", "Amazon EBS", "Amazon Route 53", "AWS Direct Connect"],
+      "choices": [
+        "AWS Lambda",
+        "Amazon EBS",
+        "Amazon Route 53",
+        "AWS Direct Connect"
+      ],
       "correctIndex": 0,
-      "explanation": "AWS Lambda runs functions on demand without server management (serverless)."
+      "explanation": "AWS Lambda runs functions on demand without requiring you to provision or manage servers."
     },
     {
       "key": "aws-rds-managed-relational",
       "topic": "AWS",
       "prompt": "Amazon RDS is best described as what?",
-      "choices": ["A managed relational database service", "A CDN", "An object store", "A message queue"],
+      "choices": [
+        "A managed relational database service",
+        "A CDN",
+        "An object store",
+        "A message queue"
+      ],
       "correctIndex": 0,
-      "explanation": "RDS manages relational databases like PostgreSQL and MySQL, handling patching and backups."
+      "explanation": "Amazon RDS is a managed relational database service supporting engines such as PostgreSQL and MySQL, with features including automated backups and managed maintenance."
     },
     {
       "key": "aws-auto-scaling-group",
       "topic": "AWS",
       "prompt": "What is the purpose of an Auto Scaling group?",
-      "choices": ["Encrypt EBS volumes", "Automatically adjust the number of EC2 instances to demand", "Route DNS globally", "Store secrets"],
+      "choices": [
+        "Encrypt EBS volumes",
+        "Automatically adjust the number of EC2 instances to demand",
+        "Route DNS globally",
+        "Store secrets"
+      ],
       "correctIndex": 1,
-      "explanation": "Auto Scaling groups add or remove instances based on load or schedules."
+      "explanation": "Auto Scaling groups add or remove EC2 instances based on scaling policies, demand, or schedules."
     },
     {
       "key": "aws-dynamodb-nosql",
       "topic": "AWS",
       "prompt": "Which service is a fully managed NoSQL key-value database?",
-      "choices": ["Amazon DynamoDB", "Amazon Redshift", "AWS Glue", "Amazon Athena"],
+      "choices": [
+        "Amazon DynamoDB",
+        "Amazon Redshift",
+        "AWS Glue",
+        "Amazon Athena"
+      ],
       "correctIndex": 0,
-      "explanation": "DynamoDB is AWS's managed NoSQL key-value and document database."
+      "explanation": "DynamoDB is AWS's fully managed NoSQL database supporting key-value and document data models."
+    },
+    {
+      "key": "caching-purpose",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is the main benefit of adding a caching layer to a system?",
+      "choices": [
+        "It guarantees data consistency across all replicas",
+        "It reduces latency by serving frequently accessed data from fast storage",
+        "It permanently stores all application data",
+        "It eliminates the need for a database"
+      ],
+      "correctIndex": 1,
+      "explanation": "Caching stores frequently accessed data in fast-access storage, such as memory, to reduce latency and database load."
+    },
+    {
+      "key": "horizontal-vs-vertical-scaling",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What does 'horizontal scaling' mean in system design?",
+      "choices": [
+        "Increasing the resources (CPU/RAM) of a single server",
+        "Adding more machines or servers to a system to handle increased load",
+        "Reducing the number of servers to save costs",
+        "Upgrading the database schema"
+      ],
+      "correctIndex": 1,
+      "explanation": "Horizontal scaling, or scaling out, means adding more machines to distribute load. Vertical scaling increases the resources of an existing machine."
+    },
+    {
+      "key": "cdn-purpose",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is a CDN (Content Delivery Network) primarily used for?",
+      "choices": [
+        "Managing database transactions",
+        "Serving static content from servers geographically closer to users to reduce latency",
+        "Encrypting user passwords",
+        "Load balancing database writes"
+      ],
+      "correctIndex": 1,
+      "explanation": "A CDN caches and serves content, such as images, videos, and scripts, from geographically distributed edge servers to reduce latency."
+    },
+    {
+      "key": "db-index-purpose",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "Why do databases use indexes?",
+      "choices": [
+        "To reduce storage space used by tables",
+        "To speed up data retrieval queries at the cost of additional storage and slower writes",
+        "To encrypt sensitive columns",
+        "To automatically back up data"
+      ],
+      "correctIndex": 1,
+      "explanation": "Indexes create data structures that allow databases to find rows more efficiently. They require additional storage and can increase the cost of writes."
+    },
+    {
+      "key": "single-point-of-failure",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is a 'single point of failure' (SPOF) in a system?",
+      "choices": [
+        "A component whose failure causes the entire system to fail",
+        "A backup server that takes over during outages",
+        "A load balancer that distributes traffic",
+        "A redundant database replica"
+      ],
+      "correctIndex": 0,
+      "explanation": "A single point of failure is a component whose failure can cause the entire system or a critical part of it to become unavailable. Redundancy can help eliminate SPOFs."
+    },
+    {
+      "key": "rate-limiting-purpose",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "Why do APIs implement rate limiting?",
+      "choices": [
+        "To increase the number of requests a client can send",
+        "To protect backend services from being overwhelmed by too many requests in a given time period",
+        "To encrypt API responses",
+        "To automatically scale servers"
+      ],
+      "correctIndex": 1,
+      "explanation": "Rate limiting caps how many requests a client can make within a defined period or according to a defined policy, helping protect services from abuse and overload."
+    },
+    {
+      "key": "mobile-offline-first",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "In mobile app system design, what does an 'offline-first' architecture prioritize?",
+      "choices": [
+        "The app only works when connected to the internet",
+        "Local data storage and functionality, syncing with the server when connectivity is available",
+        "Disabling all local storage",
+        "Requiring users to manually refresh data at all times"
+      ],
+      "correctIndex": 1,
+      "explanation": "Offline-first design stores data locally so the app can remain functional without network access, synchronizing with the backend when connectivity returns."
+    },
+    {
+      "key": "sql-vs-nosql-tradeoff",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "Which of the following is a key advantage of NoSQL databases over traditional relational (SQL) databases?",
+      "choices": [
+        "They always provide strict ACID transactions across the entire database",
+        "They typically offer more flexible schemas and easier horizontal scaling for large, unstructured datasets",
+        "They enforce foreign key constraints more strictly",
+        "They are always faster for complex multi-table joins"
+      ],
+      "correctIndex": 1,
+      "explanation": "Many NoSQL databases offer flexible data models and are designed to scale horizontally, which can suit large or semi-structured datasets. The specific capabilities depend on the database."
+    },
+    {
+      "key": "database-sharding",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is 'database sharding'?",
+      "choices": [
+        "Encrypting a database at rest",
+        "Splitting a database into smaller, independent pieces distributed across multiple servers",
+        "Creating a full backup copy of a database",
+        "Compressing database tables to save space"
+      ],
+      "correctIndex": 1,
+      "explanation": "Sharding partitions a database into smaller pieces called shards, which can be distributed across multiple servers to improve scalability."
+    },
+    {
+      "key": "master-slave-replication",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "In a primary-replica database replication setup, what is the typical role of the replicas?",
+      "choices": [
+        "They handle all write operations while the primary handles reads",
+        "They serve read requests and provide redundancy, while the primary typically handles writes",
+        "They store no data and only forward requests",
+        "They replace the primary automatically without any coordination"
+      ],
+      "correctIndex": 1,
+      "explanation": "In primary-replica replication, the primary typically handles writes, while replicas can serve reads and provide redundancy. Failover may require additional coordination or configuration."
+    },
+    {
+      "key": "consistent-hashing",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What problem does consistent hashing primarily solve in distributed systems?",
+      "choices": [
+        "It minimizes the amount of data that needs to be remapped when nodes are added or removed from a cluster",
+        "It guarantees strong consistency across all nodes",
+        "It encrypts hashed data for security",
+        "It eliminates the need for load balancing"
+      ],
+      "correctIndex": 0,
+      "explanation": "Consistent hashing minimizes key redistribution when the number of nodes in a system changes, unlike simple modulo hashing, which can remap many keys."
+    },
+    {
+      "key": "circuit-breaker-pattern",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "In system design, what does the 'circuit breaker' pattern do?",
+      "choices": [
+        "It permanently shuts down a failing service",
+        "It detects repeated failures in calls to a service and temporarily stops sending requests to it, helping prevent cascading failures",
+        "It encrypts traffic between microservices",
+        "It load balances requests evenly across servers"
+      ],
+      "correctIndex": 1,
+      "explanation": "A circuit breaker monitors for failures and trips to stop sending requests to a failing service temporarily, helping prevent cascading failures and allowing recovery."
+    },
+    {
+      "key": "eventual-consistency",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What does 'eventual consistency' mean in a distributed database?",
+      "choices": [
+        "All nodes reflect the same data at all times, instantaneously",
+        "Given enough time without new updates, all replicas will eventually converge to the same value",
+        "Data is never consistent across replicas",
+        "Writes are always rejected until consistency is verified"
+      ],
+      "correctIndex": 1,
+      "explanation": "Eventual consistency means that if no new updates occur and the system continues operating normally, replicas will eventually converge to the same state, though temporary differences may exist."
+    },
+    {
+      "key": "microservices-vs-monolith",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "Which of the following is a common tradeoff when moving from a monolithic architecture to microservices?",
+      "choices": [
+        "Reduced operational complexity but decreased scalability",
+        "Increased deployment and operational complexity in exchange for independent scalability and deployment of services",
+        "Guaranteed lower latency between all components",
+        "Elimination of the need for network communication"
+      ],
+      "correctIndex": 1,
+      "explanation": "Microservices allow independent scaling and deployment of components but introduce added complexity in orchestration, monitoring, and inter-service communication."
+    },
+    {
+      "key": "consensus-algorithms",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is the primary purpose of consensus algorithms like Raft or Paxos in distributed systems?",
+      "choices": [
+        "To compress data for network transmission",
+        "To allow a cluster of nodes to agree on a single value or sequence of operations despite failures",
+        "To encrypt communication between nodes",
+        "To balance load across web servers"
+      ],
+      "correctIndex": 1,
+      "explanation": "Consensus algorithms such as Raft and Paxos enable distributed nodes to agree on a value or an ordered sequence of operations despite certain node or network failures."
+    },
+    {
+      "key": "quorum-reads-writes",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "In a distributed database using quorum-based replication with N replicas, what does requiring W + R > N (where W is write quorum and R is read quorum) guarantee?",
+      "choices": [
+        "That writes are always faster than reads",
+        "That every read will overlap with the most recent write, helping ensure strong consistency",
+        "That the system can tolerate N node failures",
+        "That data is automatically sharded"
+      ],
+      "correctIndex": 1,
+      "explanation": "When W + R > N, every read quorum overlaps with every write quorum. This overlap can help support strong consistency, but the actual consistency guarantees also depend on the replication protocol, read-repair behavior, conflict resolution, and how the latest value is selected."
+    },
+    {
+      "key": "two-phase-commit",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is the main drawback of the two-phase commit (2PC) protocol for distributed transactions?",
+      "choices": [
+        "It cannot guarantee atomicity across nodes",
+        "The coordinator is a blocking single point of failure; if it crashes after the prepare phase, participants can be left waiting indefinitely holding locks",
+        "It only works with a single database",
+        "It does not support rollback"
+      ],
+      "correctIndex": 1,
+      "explanation": "2PC can be blocking: if the coordinator fails after participants have prepared and acquired locks, those participants may have to wait for a decision, reducing availability."
+    },
+    {
+      "key": "vector-clocks",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What problem do vector clocks help address in distributed systems?",
+      "choices": [
+        "Determining the causal ordering of events across distributed nodes without relying on synchronized physical clocks",
+        "Encrypting timestamps for security",
+        "Reducing network bandwidth usage",
+        "Load balancing across data centers"
+      ],
+      "correctIndex": 0,
+      "explanation": "Vector clocks track causal relationships between events across distributed nodes, helping determine whether one event happened before another or whether events are concurrent, without requiring synchronized physical clocks."
+    },
+    {
+      "key": "bloom-filter",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is a key characteristic of a Bloom filter data structure used in system design, such as to avoid unnecessary disk lookups?",
+      "choices": [
+        "It can produce false positives, indicating an item might be present when it is not, but never false negatives",
+        "It guarantees 100% accuracy with no false positives or negatives",
+        "It stores full copies of all elements for exact lookups",
+        "It is primarily used for encrypting data"
+      ],
+      "correctIndex": 0,
+      "explanation": "A Bloom filter is a probabilistic data structure that may yield false positives but guarantees no false negatives for membership queries. It is useful for quickly checking whether an item is definitely not present before an expensive lookup."
+    },
+    {
+      "key": "cqrs-pattern",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What does the CQRS (Command Query Responsibility Segregation) pattern propose?",
+      "choices": [
+        "Combining reads and writes into a single unified model for simplicity",
+        "Separating the models used for updating data (commands) from the models used for reading data (queries), often allowing each to be optimized and scaled independently",
+        "Encrypting commands but not queries",
+        "Eliminating the need for a database"
+      ],
+      "correctIndex": 1,
+      "explanation": "CQRS separates the write model used by commands from the read model used by queries, allowing each to be independently optimized, scaled, and potentially stored differently."
+    },
+    {
+      "key": "write-ahead-log",
+      "topic": "SYSTEM_DESIGN",
+      "prompt": "What is the purpose of a write-ahead log (WAL) in database systems?",
+      "choices": [
+        "To cache frequently read data in memory",
+        "To record changes to a durable log before they are applied to the main data store, enabling crash recovery",
+        "To compress data before storage",
+        "To distribute write load across multiple servers"
+      ],
+      "correctIndex": 1,
+      "explanation": "A write-ahead log records changes durably before they are applied to the database, allowing the system to recover after a crash by replaying the log."
+    },
+    {
+      "key": "aws-ec2-instance-purpose",
+      "topic": "AWS",
+      "prompt": "What does Amazon EC2 primarily provide?",
+      "choices": [
+        "Resizable virtual servers (compute instances) in the cloud",
+        "A managed relational database engine",
+        "A content delivery network",
+        "A static website hosting bucket"
+      ],
+      "correctIndex": 0,
+      "explanation": "Amazon EC2 (Elastic Compute Cloud) provides resizable virtual server instances that users can launch and configure in the cloud."
+    },
+    {
+      "key": "aws-vpc-definition",
+      "topic": "AWS",
+      "prompt": "What is an Amazon VPC (Virtual Private Cloud)?",
+      "choices": [
+        "A logically isolated section of the AWS Cloud where you can launch resources in a virtual network you define",
+        "A physical data center owned by a customer",
+        "A managed DNS resolution service",
+        "A tool for tracking AWS billing"
+      ],
+      "correctIndex": 0,
+      "explanation": "Amazon VPC lets customers provision a logically isolated virtual network in which they define IP address ranges, subnets, route tables, and gateways."
+    },
+    {
+      "key": "aws-security-group-vs-nacl",
+      "topic": "AWS",
+      "prompt": "Which statement correctly distinguishes Security Groups from Network ACLs (NACLs) in a VPC?",
+      "choices": [
+        "Security groups are stateless and operate at the subnet level; NACLs are stateful and operate at the instance level",
+        "Security groups are stateful and operate at the instance level; NACLs are stateless and operate at the subnet level",
+        "Both are stateful and operate at the subnet level",
+        "Both are stateless and operate at the instance level"
+      ],
+      "correctIndex": 1,
+      "explanation": "Security groups act as a stateful firewall at the instance (ENI) level, automatically allowing return traffic, while NACLs are stateless and act as a firewall at the subnet level, requiring explicit rules for both inbound and outbound traffic."
+    },
+    {
+      "key": "aws-route53-dns",
+      "topic": "AWS",
+      "prompt": "What is Amazon Route 53?",
+      "choices": [
+        "A scalable Domain Name System (DNS) web service, also used for domain registration and traffic routing",
+        "A container orchestration service",
+        "An object storage service",
+        "A relational database engine"
+      ],
+      "correctIndex": 0,
+      "explanation": "Route 53 is AWS's highly available and scalable DNS service, which also supports domain registration and various traffic-routing policies."
+    },
+    {
+      "key": "aws-cloudfront-cdn",
+      "topic": "AWS",
+      "prompt": "What is the primary function of Amazon CloudFront?",
+      "choices": [
+        "It is a content delivery network (CDN) that caches and delivers content from edge locations close to users",
+        "It is a managed NoSQL database",
+        "It provisions virtual private networks",
+        "It manages IAM user permissions"
+      ],
+      "correctIndex": 0,
+      "explanation": "CloudFront is AWS's CDN service, caching content at globally distributed edge locations to reduce latency for end users."
+    },
+    {
+      "key": "aws-s3-glacier-archival",
+      "topic": "AWS",
+      "prompt": "Which S3 storage class family is specifically designed for low-cost, long-term data archival where retrieval times of minutes to hours are acceptable?",
+      "choices": [
+        "S3 Standard",
+        "S3 Glacier storage classes",
+        "S3 Intelligent-Tiering",
+        "S3 Standard-IA"
+      ],
+      "correctIndex": 1,
+      "explanation": "The S3 Glacier storage classes are designed for archival data at low storage cost, with retrieval characteristics depending on the specific Glacier tier."
+    },
+    {
+      "key": "aws-s3-versioning",
+      "topic": "AWS",
+      "prompt": "What does enabling versioning on an S3 bucket accomplish?",
+      "choices": [
+        "It compresses objects to save storage space",
+        "It keeps multiple variants of an object in the same bucket, helping protect against accidental overwrites and deletions",
+        "It automatically encrypts all new objects",
+        "It replicates the bucket to another AWS account"
+      ],
+      "correctIndex": 1,
+      "explanation": "S3 versioning preserves multiple versions of objects in a bucket, helping recover from unintended overwrites or deletions."
+    },
+    {
+      "key": "aws-ebs-vs-instance-store",
+      "topic": "AWS",
+      "prompt": "What is a key difference between Amazon EBS volumes and EC2 instance store volumes?",
+      "choices": [
+        "EBS volumes are persistent block storage that can survive instance stop/termination (depending on configuration); instance store data is ephemeral and lost when the instance stops or terminates",
+        "Instance store volumes are network-attached and persistent, while EBS volumes are physically attached and ephemeral",
+        "EBS volumes cannot be resized, while instance store volumes can",
+        "Instance store volumes support snapshots, while EBS volumes do not"
+      ],
+      "correctIndex": 0,
+      "explanation": "EBS provides persistent block storage that exists independently of the instance lifecycle, while instance store volumes are ephemeral storage whose data is lost when the instance is stopped or terminated."
+    },
+    {
+      "key": "aws-fargate-serverless-containers",
+      "topic": "AWS",
+      "prompt": "What does AWS Fargate provide?",
+      "choices": [
+        "A serverless compute engine for containers that removes the need to provision or manage the underlying EC2 servers",
+        "A managed Kubernetes control plane only",
+        "A relational database compatible with PostgreSQL",
+        "A service for managing DNS records"
+      ],
+      "correctIndex": 0,
+      "explanation": "Fargate is a serverless compute engine usable with ECS and EKS that lets users run containers without provisioning or managing the underlying EC2 instances."
+    },
+    {
+      "key": "aws-cloudformation-iac",
+      "topic": "AWS",
+      "prompt": "What is the primary purpose of AWS CloudFormation?",
+      "choices": [
+        "To provision and manage AWS resources using declarative templates (Infrastructure as Code)",
+        "To monitor application performance metrics",
+        "To manage user identities and permissions",
+        "To provide a content delivery network"
+      ],
+      "correctIndex": 0,
+      "explanation": "CloudFormation lets users define AWS infrastructure as code in JSON or YAML templates, which it uses to provision and manage resources as stacks."
+    },
+    {
+      "key": "aws-cloudwatch-monitoring",
+      "topic": "AWS",
+      "prompt": "What is Amazon CloudWatch primarily used for?",
+      "choices": [
+        "Monitoring AWS resources and applications by collecting metrics, logs, and setting alarms",
+        "Storing and versioning application source code",
+        "Encrypting data stored in S3",
+        "Routing traffic between VPCs"
+      ],
+      "correctIndex": 0,
+      "explanation": "CloudWatch collects monitoring and operational data such as metrics and logs, and allows users to set alarms and take automated actions based on that data."
+    },
+    {
+      "key": "aws-sns-pubsub",
+      "topic": "AWS",
+      "prompt": "Amazon SNS (Simple Notification Service) is best described as what kind of service?",
+      "choices": [
+        "A pub/sub messaging service that pushes notifications to multiple subscribers such as email, SMS, Lambda, or SQS queues",
+        "A block storage service for EC2 instances",
+        "A managed relational database service",
+        "A DNS resolution service"
+      ],
+      "correctIndex": 0,
+      "explanation": "SNS is a publish/subscribe messaging service that can fan out a single published message to multiple types of subscribers."
+    },
+    {
+      "key": "aws-sqs-fifo-vs-standard",
+      "topic": "AWS",
+      "prompt": "What distinguishes an Amazon SQS FIFO queue from a Standard queue?",
+      "choices": [
+        "FIFO queues preserve message order and support exactly-once processing semantics, while Standard queues offer best-effort ordering with at-least-once delivery and generally higher throughput",
+        "Standard queues guarantee exact ordering while FIFO queues do not",
+        "FIFO queues cannot be used with Lambda triggers",
+        "Standard queues can only hold one message at a time"
+      ],
+      "correctIndex": 0,
+      "explanation": "SQS FIFO queues provide ordering and exactly-once processing capabilities, while Standard queues provide at-least-once delivery, best-effort ordering, and higher throughput."
+    },
+    {
+      "key": "aws-elasticache-purpose",
+      "topic": "AWS",
+      "prompt": "What is Amazon ElastiCache used for?",
+      "choices": [
+        "Providing a managed in-memory caching service, supporting engines like Redis and Memcached, to improve application performance",
+        "Running managed Hadoop clusters for big data processing",
+        "Serving as a fully managed data warehouse",
+        "Managing container orchestration"
+      ],
+      "correctIndex": 0,
+      "explanation": "ElastiCache is a managed in-memory data store and caching service used to reduce latency by caching frequently accessed data."
+    },
+    {
+      "key": "aws-redshift-data-warehouse",
+      "topic": "AWS",
+      "prompt": "What is Amazon Redshift primarily designed for?",
+      "choices": [
+        "Fully managed, petabyte-scale data warehousing and analytics using SQL",
+        "Low-latency key-value storage for mobile apps",
+        "Hosting static websites",
+        "Managing DNS failover routing"
+      ],
+      "correctIndex": 0,
+      "explanation": "Redshift is a managed cloud data warehouse designed for analytical queries over large datasets using SQL."
+    },
+    {
+      "key": "aws-kms-encryption",
+      "topic": "AWS",
+      "prompt": "What is the primary function of AWS Key Management Service (KMS)?",
+      "choices": [
+        "Creating and managing cryptographic keys used to encrypt and decrypt data across AWS services",
+        "Storing files for long-term archival",
+        "Managing EC2 Auto Scaling policies",
+        "Providing a managed Kubernetes control plane"
+      ],
+      "correctIndex": 0,
+      "explanation": "AWS KMS lets users create, manage, and control cryptographic keys used to protect data across integrated AWS services and applications."
+    },
+    {
+      "key": "aws-secrets-manager-vs-parameter-store",
+      "topic": "AWS",
+      "prompt": "Which capability is a key differentiator that AWS Secrets Manager offers for credentials like database passwords, compared to Systems Manager Parameter Store's core standard functionality?",
+      "choices": [
+        "Built-in automatic rotation of secrets on a defined schedule",
+        "The ability to store any string value at all",
+        "Encryption of stored values",
+        "Access control via IAM policies"
+      ],
+      "correctIndex": 0,
+      "explanation": "Secrets Manager provides built-in automatic rotation for secrets such as database credentials using rotation mechanisms, while Parameter Store's standard functionality focuses on parameter storage."
+    },
+    {
+      "key": "aws-api-gateway-purpose",
+      "topic": "AWS",
+      "prompt": "What is the main role of Amazon API Gateway?",
+      "choices": [
+        "A fully managed service for creating, publishing, and managing APIs that act as a front door for applications to access backend services",
+        "A service for provisioning virtual private networks",
+        "A tool for managing EC2 instance snapshots",
+        "A managed file storage system"
+      ],
+      "correctIndex": 0,
+      "explanation": "API Gateway lets developers create, publish, secure, and monitor APIs that route requests to backend services such as Lambda functions."
+    },
+    {
+      "key": "aws-cloudtrail-audit-logging",
+      "topic": "AWS",
+      "prompt": "What does AWS CloudTrail primarily do?",
+      "choices": [
+        "Records and logs API calls and account activity across AWS services for auditing and governance",
+        "Distributes traffic across multiple EC2 instances",
+        "Provides managed message queuing",
+        "Encrypts data stored in RDS databases"
+      ],
+      "correctIndex": 0,
+      "explanation": "CloudTrail records account activity and API calls made across AWS services, enabling governance, compliance auditing, and operational and risk auditing."
+    },
+    {
+      "key": "aws-rds-multi-az-vs-read-replica",
+      "topic": "AWS",
+      "prompt": "What is the primary difference between an RDS Multi-AZ deployment and an RDS Read Replica?",
+      "choices": [
+        "Multi-AZ maintains a synchronous standby in another Availability Zone mainly for high availability/failover, while Read Replicas use asynchronous replication mainly to scale read traffic",
+        "Multi-AZ is used only for read scaling, while Read Replicas are used only for failover",
+        "Read Replicas must be in the same Availability Zone as the primary",
+        "Multi-AZ deployments do not involve any data replication"
+      ],
+      "correctIndex": 0,
+      "explanation": "RDS Multi-AZ is primarily designed for high availability and failover, while Read Replicas use asynchronous replication and are primarily intended to offload read traffic."
+    },
+    {
+      "key": "aws-aurora-relational-db",
+      "topic": "AWS",
+      "prompt": "What is Amazon Aurora?",
+      "choices": [
+        "An AWS relational database engine compatible with MySQL and PostgreSQL, built for high performance and availability",
+        "A NoSQL key-value store",
+        "A managed data warehousing service",
+        "A serverless function execution service"
+      ],
+      "correctIndex": 0,
+      "explanation": "Aurora is an AWS relational database engine compatible with MySQL and PostgreSQL, designed for high performance and availability and integrated with Amazon RDS."
+    },
+    {
+      "key": "aws-dynamodb-gsi-vs-lsi",
+      "topic": "AWS",
+      "prompt": "What is a key difference between a DynamoDB Global Secondary Index (GSI) and a Local Secondary Index (LSI)?",
+      "choices": [
+        "A GSI can have a different partition key than the base table and supports eventually consistent reads, while an LSI shares the base table's partition key and supports strongly consistent reads",
+        "An LSI can have a different partition key than the base table, while a GSI cannot",
+        "A GSI must be created when the table is created, while an LSI can be added at any time",
+        "Only an LSI can span multiple partitions"
+      ],
+      "correctIndex": 0,
+      "explanation": "A GSI can use a partition key and sort key different from the base table, while an LSI uses the same partition key as the base table with a different sort key. LSIs support strongly consistent reads, while GSIs do not."
+    },
+    {
+      "key": "aws-elb-types",
+      "topic": "AWS",
+      "prompt": "Which AWS Elastic Load Balancer type operates at the transport layer (Layer 4) and is designed for extremely high performance and low latency, including support for static IP addresses?",
+      "choices": [
+        "Application Load Balancer (ALB)",
+        "Network Load Balancer (NLB)",
+        "Classic Load Balancer (CLB)",
+        "Gateway Load Balancer (GWLB)"
+      ],
+      "correctIndex": 1,
+      "explanation": "The Network Load Balancer operates primarily at Layer 4 and supports TCP, UDP, and TLS traffic, with features including static IP addresses and high throughput."
+    },
+    {
+      "key": "aws-nat-gateway-purpose",
+      "topic": "AWS",
+      "prompt": "What is the purpose of a NAT Gateway in a VPC?",
+      "choices": [
+        "It allows instances in a private subnet to initiate outbound connections to the internet while preventing the internet from initiating connections to them",
+        "It encrypts all traffic leaving the VPC",
+        "It load balances traffic between multiple Availability Zones",
+        "It provides DNS resolution for the VPC"
+      ],
+      "correctIndex": 0,
+      "explanation": "A NAT Gateway enables resources in a private subnet to initiate outbound connections to the internet while preventing unsolicited inbound connections initiated from the internet."
+    },
+    {
+      "key": "aws-well-architected-pillars",
+      "topic": "AWS",
+      "prompt": "As of the current version, how many pillars does the AWS Well-Architected Framework consist of, and what was added most recently?",
+      "choices": [
+        "Five pillars, with no additions since its creation",
+        "Six pillars, with Sustainability added as the newest pillar",
+        "Four pillars, focused only on cost and performance",
+        "Seven pillars, with Scalability added as the newest pillar"
+      ],
+      "correctIndex": 1,
+      "explanation": "The AWS Well-Architected Framework consists of six pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability."
+    },
+    {
+      "key": "qz-crud-acronym",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In software development, what does the acronym CRUD stand for?",
+      "choices": [
+        "Create, Read, Update, Delete",
+        "Copy, Run, Undo, Debug",
+        "Create, Retrieve, Undo, Deploy",
+        "Compile, Run, Update, Debug"
+      ],
+      "correctIndex": 0,
+      "explanation": "CRUD refers to the four basic operations used to manage persistent data: Create, Read, Update, and Delete."
+    },
+    {
+      "key": "qz-stack-lifo",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "Which ordering principle describes how a stack data structure operates?",
+      "choices": [
+        "First In, First Out (FIFO)",
+        "Last In, First Out (LIFO)",
+        "Random access",
+        "Priority-based"
+      ],
+      "correctIndex": 1,
+      "explanation": "A stack adds and removes elements from the same end, so the last element pushed is the first one popped (LIFO)."
+    },
+    {
+      "key": "qz-git-clone-command",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "Which Git command creates a local copy of a remote repository?",
+      "choices": [
+        "git init",
+        "git pull",
+        "git clone",
+        "git fetch"
+      ],
+      "correctIndex": 2,
+      "explanation": "git clone downloads a full copy of a remote repository, including its history, to a new local directory."
+    },
+    {
+      "key": "qz-api-acronym",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What does the acronym API stand for?",
+      "choices": [
+        "Automated Program Interaction",
+        "Application Programming Interface",
+        "Application Process Integration",
+        "Advanced Protocol Interface"
+      ],
+      "correctIndex": 1,
+      "explanation": "API stands for Application Programming Interface, a set of rules that lets different software components communicate."
+    },
+    {
+      "key": "qz-mvc-acronym",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In software architecture, what does the MVC design pattern stand for?",
+      "choices": [
+        "Model-View-Controller",
+        "Module-Variable-Class",
+        "Main-View-Component",
+        "Model-Validation-Component"
+      ],
+      "correctIndex": 0,
+      "explanation": "MVC separates an application into Model (data), View (UI), and Controller (logic connecting the two)."
+    },
+    {
+      "key": "qz-singleton-pattern",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is the primary purpose of the Singleton design pattern?",
+      "choices": [
+        "To create multiple independent instances of a class",
+        "To restrict a class to a single instance and provide a global access point to it",
+        "To convert an interface into another interface a client expects",
+        "To separate the construction of a complex object from its representation"
+      ],
+      "correctIndex": 1,
+      "explanation": "The Singleton pattern ensures a class has only one instance and provides a single, global point of access to that instance."
+    },
+    {
+      "key": "qz-http-404",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In HTTP, what does a 404 status code indicate?",
+      "choices": [
+        "Server error",
+        "Unauthorized access",
+        "Resource not found",
+        "Request successful"
+      ],
+      "correctIndex": 2,
+      "explanation": "A 404 status code means the server could not find the requested resource."
+    },
+    {
+      "key": "qz-quicksort-avg-complexity",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is the average-case time complexity of the Quicksort algorithm?",
+      "choices": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)",
+        "O(log n)"
+      ],
+      "correctIndex": 1,
+      "explanation": "With a good pivot choice, Quicksort partitions the array into balanced halves on average, giving O(n log n) time."
+    },
+    {
+      "key": "qz-acid-atomicity",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In the ACID properties of database transactions, what does 'Atomicity' guarantee?",
+      "choices": [
+        "Transactions are executed in isolation from one another",
+        "A transaction is treated as a single, indivisible unit that either fully completes or fully fails",
+        "Data remains valid according to defined rules after a transaction",
+        "Committed changes survive system failures"
+      ],
+      "correctIndex": 1,
+      "explanation": "Atomicity ensures a transaction is all-or-nothing: if any part fails, the entire transaction is rolled back."
+    },
+    {
+      "key": "qz-stack-vs-heap-memory",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "Which statement correctly distinguishes stack memory from heap memory in most programming languages?",
+      "choices": [
+        "Stack memory is used for dynamic allocation with manual or garbage-collected management; heap is used for local variables and function calls",
+        "Stack memory stores local variables and function call frames with automatic management; heap memory is used for dynamic allocation that persists beyond a function call",
+        "Stack and heap memory are interchangeable terms for the same memory region",
+        "Heap memory is always faster to access than stack memory"
+      ],
+      "correctIndex": 1,
+      "explanation": "The stack automatically manages local variables and call frames in LIFO order, while the heap holds dynamically allocated memory that can outlive the function that created it."
+    },
+    {
+      "key": "qz-rest-stateless",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "Which constraint of REST architecture requires that each client request contain all the information needed for the server to process it, without relying on stored context from previous requests?",
+      "choices": [
+        "Cacheability",
+        "Statelessness",
+        "Layered system",
+        "Uniform interface"
+      ],
+      "correctIndex": 1,
+      "explanation": "The statelessness constraint means the server does not store client session state between requests; each request must be self-contained."
+    },
+    {
+      "key": "qz-dependency-injection",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is the main goal of the Dependency Injection design pattern?",
+      "choices": [
+        "To hard-code a class's dependencies inside its constructor",
+        "To supply a class's dependencies from an external source rather than having the class create them itself, reducing coupling",
+        "To automatically inject SQL queries into an application",
+        "To inject additional threads into a running process"
+      ],
+      "correctIndex": 1,
+      "explanation": "Dependency Injection provides an object's dependencies from outside rather than letting it construct them internally, which promotes loose coupling and easier testing."
+    },
+    {
+      "key": "qz-polymorphism",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In object-oriented programming, what does 'polymorphism' refer to?",
+      "choices": [
+        "Hiding internal implementation details of a class from outside code",
+        "The ability of different classes to be treated through the same interface, with each providing its own implementation of shared behavior",
+        "The mechanism of one class acquiring the properties of another class",
+        "Combining data and methods into a single unit"
+      ],
+      "correctIndex": 1,
+      "explanation": "Polymorphism allows objects of different classes to be accessed through a common interface, with each class implementing behavior in its own way."
+    },
+    {
+      "key": "qz-deadlock-conditions",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "Which four conditions must all hold simultaneously for a deadlock to occur in an operating system?",
+      "choices": [
+        "Mutual exclusion, hold and wait, no preemption, circular wait",
+        "Mutual exclusion, preemption, linear wait, starvation",
+        "Shared access, hold and wait, preemption, circular wait",
+        "Mutual exclusion, hold and wait, no preemption, sequential wait"
+      ],
+      "correctIndex": 0,
+      "explanation": "Deadlock requires mutual exclusion, hold-and-wait, no preemption, and circular wait to all be present at once; breaking any one prevents deadlock."
+    },
+    {
+      "key": "qz-merge-sort-worst-case",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is the worst-case time complexity of Merge Sort?",
+      "choices": [
+        "O(n^2)",
+        "O(n log n)",
+        "O(n)",
+        "O(log n)"
+      ],
+      "correctIndex": 1,
+      "explanation": "Merge Sort always divides the array in half and merges in linear time, giving a guaranteed O(n log n) complexity even in the worst case."
+    },
+    {
+      "key": "qz-mutex-vs-semaphore",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is a key difference between a mutex and a (counting) semaphore?",
+      "choices": [
+        "A mutex allows multiple threads to access a resource simultaneously, while a semaphore only allows one",
+        "A mutex is a locking mechanism typically owned and released by the same thread that locked it, while a counting semaphore can allow a set number of threads and is not tied to a single owner",
+        "A mutex and a semaphore are exactly the same concept with different names",
+        "A semaphore can only be used within a single process, while a mutex works across processes"
+      ],
+      "correctIndex": 1,
+      "explanation": "A mutex provides exclusive ownership-based locking typically released by its owner, whereas a counting semaphore tracks a count of available permits and can be signaled by any thread, allowing multiple concurrent holders."
+    },
+    {
+      "key": "qz-dijkstra-complexity",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "Using a binary min-heap priority queue, what is the time complexity of Dijkstra's shortest-path algorithm on a graph with V vertices and E edges?",
+      "choices": [
+        "O(V^2)",
+        "O((V + E) log V)",
+        "O(E log E) only",
+        "O(V + E)"
+      ],
+      "correctIndex": 1,
+      "explanation": "With a binary heap, each vertex extraction and edge relaxation costs O(log V), giving an overall complexity of O((V + E) log V)."
+    },
+    {
+      "key": "qz-http-idempotent-put",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In HTTP semantics, why is the PUT method considered idempotent while POST is not?",
+      "choices": [
+        "PUT cannot modify server data, while POST can",
+        "Making the same PUT request multiple times produces the same result as making it once, whereas repeated identical POST requests can create multiple resources or side effects",
+        "PUT requests are always cached, while POST requests never are",
+        "Idempotency is not a defined concept in HTTP"
+      ],
+      "correctIndex": 1,
+      "explanation": "PUT replaces a resource with the given representation, so repeating it leaves the same end state, while POST typically creates a new resource each time it's called, so repeating it can have cumulative effects."
+    },
+    {
+      "key": "qz-technical-debt",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "In software engineering, what does the term 'technical debt' refer to?",
+      "choices": [
+        "The financial cost of purchasing developer tools",
+        "The implied future cost of extra rework caused by choosing an easy or quick solution now instead of a better, more thorough approach",
+        "A bug tracking metric used in agile sprints",
+        "The amount of unused code left in a repository"
+      ],
+      "correctIndex": 1,
+      "explanation": "Technical debt describes the trade-off where expedient but suboptimal code choices save time now but require costly rework later."
+    },
+    {
+      "key": "qz-hash-table-lookup-complexity",
+      "topic": "SOFTWARE_ENGINEERING",
+      "prompt": "What is the average-case time complexity for a lookup operation in a well-implemented hash table?",
+      "choices": [
+        "O(n)",
+        "O(log n)",
+        "O(1)",
+        "O(n log n)"
+      ],
+      "correctIndex": 2,
+      "explanation": "With a good hash function and low load factor, hash table lookups take constant average time, O(1), though worst case can degrade to O(n) due to collisions."
     }
   ]
 }
