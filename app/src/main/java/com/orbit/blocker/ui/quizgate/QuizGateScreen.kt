@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -122,7 +124,15 @@ private fun QuizInProgress(
     onNext: () -> Unit,
     onQuickAccess: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    // Long prompts and answers can exceed the screen height and push the action button off the
+    // bottom, so the whole question scrolls. fillMaxSize + verticalScroll gives a scrollable
+    // region that still lets short questions sit naturally near the top.
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         if (appLabel != null) {
             Text(
                 "Unlocking $appLabel",
@@ -131,13 +141,13 @@ private fun QuizInProgress(
             )
         }
         Text(
-            "Question ${state.index + 1} of ${state.total}",
+            "${state.correctSoFar} of ${state.required} correct",
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp),
         )
         GlassProgressBar(
-            progress = (state.index + 1f) / state.total,
+            progress = state.correctSoFar.toFloat() / state.required,
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
         )
         Text(
@@ -186,12 +196,18 @@ private fun QuizInProgress(
                 Text("Submit")
             }
         } else {
-            // Phase 2: answer revealed; advance to the next question or finish the quiz.
+            // Phase 2: answer revealed. A wrong answer keeps the gate open and serves another
+            // question ("Try again") — the app only unlocks once enough answers are correct.
+            val label = when {
+                state.answeredWrong -> "Try again"
+                state.isLastNeeded -> "Unlock"
+                else -> "Next"
+            }
             Button(
                 onClick = onNext,
                 modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
             ) {
-                Text(if (state.isLast) "Finish" else "Next")
+                Text(label)
             }
         }
 
