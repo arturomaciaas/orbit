@@ -134,9 +134,12 @@ object GalaxyEngine {
     /**
      * Decides the effect of a meteor strike. [meteorStrikes] is always incremented.
      *
-     * If the current system has (non-doomed) completed planets, one is chosen at random and
-     * *marked* for destruction ([MeteorEffect.PlanetDestroyed]) by setting
-     * [GalaxyProgress.doomedPlanetId]. The planet is NOT removed here — the UI flies a meteor
+     * If the current system has (non-doomed) completed planets, the most recently completed
+     * one (the highest orbit slot) is *marked* for destruction ([MeteorEffect.PlanetDestroyed])
+     * by setting [GalaxyProgress.doomedPlanetId]. Destroying in slot order (outermost first)
+     * peels back the newest progress and keeps the surviving planets contiguous from slot 0,
+     * so the same planet the meteor targets is always the one removed. The planet is NOT
+     * removed here — the UI flies a meteor
      * to it and calls [resolveDoomedPlanet] on impact to actually delete it. This keeps the
      * animation and the data change in sync and lets the destruction be shown even if the
      * app was closed when the strike fired.
@@ -162,7 +165,10 @@ object GalaxyEngine {
                 progress = struck.copy(stage = stage, progress = progress),
             )
         }
-        val victim = targetable[random.nextInt(targetable.size)]
+        // Destroy in order: always take the outermost (highest-slot) completed planet, i.e.
+        // the most recently earned one. Deterministic targeting removes any ambiguity between
+        // the planet the meteor visually hits and the planet the data layer deletes.
+        val victim = targetable.maxByOrNull { it.slot }!!
         return MeteorEffect.PlanetDestroyed(
             progress = struck.copy(doomedPlanetId = victim.id),
             doomed = victim,

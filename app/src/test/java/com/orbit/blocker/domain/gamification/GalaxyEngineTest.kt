@@ -72,7 +72,7 @@ class GalaxyEngineTest {
     }
 
     @Test
-    fun meteorDestroysARandomCompletedPlanet() {
+    fun meteorDestroysTheOutermostCompletedPlanet() {
         val p = GalaxyProgress(planetsInSystem = 3, currentSystemIndex = 0)
         val planets = listOf(
             CompletedPlanet(id = 1, systemIndex = 0, slot = 0, type = PlanetType.TERRAN),
@@ -82,7 +82,9 @@ class GalaxyEngineTest {
         val effect = GalaxyEngine.planMeteorStrike(p, planets, random = Random(42))
         assertThat(effect).isInstanceOf(GalaxyEngine.MeteorEffect.PlanetDestroyed::class.java)
         effect as GalaxyEngine.MeteorEffect.PlanetDestroyed
-        assertThat(planets).contains(effect.doomed)
+        // Destruction is deterministic: the outermost (highest-slot) planet is always targeted.
+        assertThat(effect.doomed.slot).isEqualTo(2)
+        assertThat(effect.doomed.id).isEqualTo(3L)
         // The planet is only *marked* doomed here; count is unchanged until impact resolves.
         assertThat(effect.progress.doomedPlanetId).isEqualTo(effect.doomed.id)
         assertThat(effect.progress.planetsInSystem).isEqualTo(3)
