@@ -90,21 +90,75 @@ data class NotificationRecord(
 )
 
 /**
- * Single-row table holding the current gamification state. [progress] is a
- * continuous 0f..1f value within the current [stage]; crossing 1f advances the stage.
+ * Single-row table holding the current gamification state.
+ *
+ * The cosmos is now modeled as three nested layers instead of one morphing body:
+ *
+ *  - The **active planet** ([activePlanetType]) is what the user is growing right now.
+ *    [stage] is its lifecycle stage and [progress] (0f..1f) is progress within that stage.
+ *    Completing a focus session grows it; when it reaches its type's final stage it
+ *    "locks in" to the current solar system and a fresh active planet begins.
+ *  - The **solar system** is the set of [CompletedPlanet] rows for [currentSystemIndex],
+ *    orbiting a central star. [planetsInSystem] mirrors that count for convenience.
+ *  - The **galaxy** is the collection of completed solar systems: each finished system
+ *    becomes one distant star. [systemsCompleted] counts them.
+ *
+ * A solar system is complete at [PLANETS_PER_SYSTEM] planets; completing it increments
+ * [systemsCompleted], starts a new (empty) system, and begins a fresh active planet.
  */
 @Entity(tableName = "galaxy_progress")
 data class GalaxyProgress(
     @PrimaryKey val id: Int = SINGLETON_ID,
-    val stage: GalaxyStage = GalaxyStage.PLANET,
+    /** Type of the planet currently being grown. */
+    val activePlanetType: PlanetType = PlanetType.TERRAN,
+    /** Lifecycle stage of the active planet. */
+    val stage: PlanetStage = PlanetStage.PLANET,
+    /** Progress (0f..1f) within the active planet's current [stage]. */
     val progress: Float = 0f,
+    /** How many planets have been locked into the *current* (in-progress) solar system. */
+    val planetsInSystem: Int = 0,
+    /** Zero-based index of the solar system currently being built. */
+    val currentSystemIndex: Int = 0,
+    /** How many full solar systems have been completed (each becomes a star in the galaxy). */
+    val systemsCompleted: Int = 0,
     val totalSessionsCompleted: Int = 0,
     val currentStreakDays: Int = 0,
     val longestStreakDays: Int = 0,
     val lastSessionCompletedAt: Long? = null,
     val meteorStrikes: Int = 0,
+    /**
+     * Id of a [CompletedPlanet] that a meteor has marked for destruction but that hasn't
+     * been animated/removed yet. Set at strike time; the Cosmos screen flies a meteor to
+     * this planet and deletes it on impact, then clears this back to null. Survives process
+     * death so the destruction is always shown, whichever screen fired the strike.
+     */
+    val doomedPlanetId: Long? = null,
 ) {
     companion object {
         const val SINGLETON_ID = 1
+
+        /** Planets required to complete one solar system (8 planets + 1 star). */
+        const val PLANETS_PER_SYSTEM = 8
     }
 }
+
+/**
+ * A planet that has finished its lifecycle and locked into a solar system. Each row is
+ * one orbiting body in the solar-system view. Rows are scoped to a [systemIndex] so a
+ * completed system's planets are preserved even as the next system is built.
+ *
+ * A meteor strike destroys one of these rows (a random planet in the current system).
+ */
+@Entity(
+    tableName = "completed_planets",
+    indices = [Index("systemIndex")],
+)
+data class CompletedPlanet(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    /** Which solar system this planet belongs to (matches [GalaxyProgress.currentSystemIndex]). */
+    val systemIndex: Int,
+    /** Orbit slot (0-based) within the system, used to place it in the view. */
+    val slot: Int,
+    val type: PlanetType,
+    val completedAt: Long = System.currentTimeMillis(),
+)

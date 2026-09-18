@@ -35,6 +35,7 @@ import com.orbit.blocker.service.NotificationAccessPermission
 @Composable
 fun SettingsScreen(
     onOpenQuizBank: () -> Unit,
+    onOpenDeveloper: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val questionsRequired by viewModel.questionsRequired.collectAsStateWithLifecycle()
@@ -173,6 +174,21 @@ fun SettingsScreen(
                     else MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(top = 8.dp),
                 )
+            }
+        }
+
+        Column {
+            Text("Developer", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "Preview the cosmos and its stages with mock data. For testing only.",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedButton(
+                onClick = onOpenDeveloper,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            ) {
+                Text("Open developer preview")
             }
         }
 

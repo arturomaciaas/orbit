@@ -53,5 +53,8 @@ class OrbitSettings @Inject constructor(
     companion object {
         const val DEFAULT_QUESTIONS_REQUIRED = 3
         const val DEFAULT_ACCESS_WINDOW_MILLIS = 5 * 60 * 1000L // 5 minutes
+
+        /** Fixed access window granted by the "1-minute quick access" bypass. */
+        const val QUICK_ACCESS_WINDOW_MILLIS = 60 * 1000L // 1 minute
     }
 }

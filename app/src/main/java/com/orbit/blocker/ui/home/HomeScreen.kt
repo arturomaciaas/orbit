@@ -17,29 +17,65 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.orbit.blocker.data.model.CosmosView
+import com.orbit.blocker.data.model.GalaxyProgress
+import com.orbit.blocker.data.model.PlanetStage
 import com.orbit.blocker.domain.gamification.GalaxyEngine
 import com.orbit.blocker.ui.components.GlassCard
+import com.orbit.blocker.ui.components.GlassPill
 import com.orbit.blocker.ui.components.GlassProgressBar
 import com.orbit.blocker.ui.components.SectionLabel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     val progress by viewModel.progress.collectAsStateWithLifecycle()
-    val visual = remember(progress.stage) { GalaxyVisual.forStage(progress.stage) }
+    val systemPlanets by viewModel.systemPlanets.collectAsStateWithLifecycle()
 
-    // Trigger a meteor animation whenever the strike count increases.
+    var view by remember { mutableStateOf(CosmosView.PLANET) }
+    val planetVisual = remember(progress.activePlanetType) {
+        PlanetVisual.forType(progress.activePlanetType)
+    }
+
+    // Meteor animation driver. A single Animatable feeds both the targeted (system view)
+    // and the setback (planet view) impact renderers.
     val meteor = remember { Animatable(0f) }
-    LaunchedEffect(progress.meteorStrikes) {
-        if (progress.meteorStrikes > 0) {
+
+    // A planet marked for destruction: fly a meteor at it in the SYSTEM view, then remove it
+    // at impact. Keyed on the doomed id so a fresh strike restarts the sequence.
+    LaunchedEffect(progress.doomedPlanetId) {
+        val doomed = progress.doomedPlanetId
+        if (doomed != null) {
+            view = CosmosView.SOLAR_SYSTEM // make sure the user witnesses the nuke
             meteor.snapTo(0f)
-            meteor.animateTo(1f, animationSpec = tween(900))
+            // Approach phase.
+            meteor.animateTo(IMPACT_FRACTION, animationSpec = tween(750))
+            // Impact: remove the planet now so the explosion replaces it.
+            viewModel.onMeteorImpact()
+            // Blast phase.
+            meteor.animateTo(1f, animationSpec = tween(650))
+            meteor.snapTo(0f)
+        }
+    }
+
+    // A pure setback (no planet to destroy): play the impact on the active planet close-up.
+    // Detected as a strike-count increase that did NOT leave a doomed planet.
+    var lastStrikes by remember { mutableStateOf(progress.meteorStrikes) }
+    LaunchedEffect(progress.meteorStrikes) {
+        val increased = progress.meteorStrikes > lastStrikes
+        lastStrikes = progress.meteorStrikes
+        if (increased && progress.doomedPlanetId == null) {
+            view = CosmosView.PLANET
+            meteor.snapTo(0f)
+            meteor.animateTo(1f, animationSpec = tween(1100))
             meteor.snapTo(0f)
         }
     }
@@ -54,57 +90,115 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
         Column {
             SectionLabel("Your cosmos")
             Text(
-                visual.title,
+                cosmosTitle(view, progress, planetVisual.title),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
+            Text(
+                cosmosSubtitle(view, progress),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp),
+            )
         }
 
-        // The planet/galaxy sits directly on the space backdrop (no card) for maximum impact.
+        // Zoom-level switcher: Planet -> Solar System -> Galaxy.
+        ViewSwitcher(view = view, onSelect = { view = it })
+
+        // The animated scene sits directly on the space backdrop (no card) for max impact.
         Box(
             modifier = Modifier.fillMaxWidth().aspectRatio(1f),
             contentAlignment = Alignment.Center,
         ) {
-            GalaxyCanvas(
-                visual = visual,
-                meteorProgress = meteor.value,
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
-
-        // Growth card.
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text("Growth", style = MaterialTheme.typography.titleLarge)
-                Text(
-                    "${(GalaxyEngine.overallFraction(progress) * 100).toInt()}%",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary,
+            when (view) {
+                CosmosView.PLANET -> PlanetCanvas(
+                    type = progress.activePlanetType,
+                    stage = progress.stage,
+                    // Only show the close-up meteor for pure setbacks (no doomed planet).
+                    meteorProgress = if (progress.doomedPlanetId == null) meteor.value else 0f,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                CosmosView.SOLAR_SYSTEM -> SolarSystemCanvas(
+                    planets = systemPlanets,
+                    doomedPlanetId = progress.doomedPlanetId,
+                    impactProgress = if (progress.doomedPlanetId != null) meteor.value else 0f,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                CosmosView.GALAXY -> GalaxyCanvas(
+                    systemsCompleted = progress.systemsCompleted,
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
-            Text(
-                "Progress toward the next stage",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 2.dp, bottom = 12.dp),
-            )
-            GlassProgressBar(progress = progress.progress, modifier = Modifier.fillMaxWidth())
         }
+
+        // Growth card — meaning depends on the current view.
+        GrowthCard(view = view, progress = progress)
 
         // Stats card.
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
             ) {
                 Stat(label = "Sessions", value = progress.totalSessionsCompleted.toString())
+                Stat(label = "Planets", value = "${progress.planetsInSystem}/${GalaxyProgress.PLANETS_PER_SYSTEM}")
+                Stat(label = "Systems", value = progress.systemsCompleted.toString())
                 Stat(label = "Streak", value = "${progress.currentStreakDays}d")
-                Stat(label = "Best", value = "${progress.longestStreakDays}d")
             }
         }
+    }
+}
+
+@Composable
+private fun ViewSwitcher(view: CosmosView, onSelect: (CosmosView) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        GlassPill(text = "Planet", selected = view == CosmosView.PLANET, onClick = { onSelect(CosmosView.PLANET) })
+        GlassPill(text = "System", selected = view == CosmosView.SOLAR_SYSTEM, onClick = { onSelect(CosmosView.SOLAR_SYSTEM) })
+        GlassPill(text = "Galaxy", selected = view == CosmosView.GALAXY, onClick = { onSelect(CosmosView.GALAXY) })
+    }
+}
+
+@Composable
+private fun GrowthCard(view: CosmosView, progress: GalaxyProgress) {
+    val (label, fraction, caption) = when (view) {
+        CosmosView.PLANET -> Triple(
+            "Planet growth",
+            progress.progress,
+            "${stageLabel(progress.stage)} — progress toward the next stage",
+        )
+        CosmosView.SOLAR_SYSTEM -> Triple(
+            "System progress",
+            GalaxyEngine.systemFraction(progress),
+            "${progress.planetsInSystem} of ${GalaxyProgress.PLANETS_PER_SYSTEM} planets complete",
+        )
+        CosmosView.GALAXY -> Triple(
+            "Galaxy",
+            galaxyFraction(progress.systemsCompleted),
+            "${progress.systemsCompleted} completed ${if (progress.systemsCompleted == 1) "system" else "systems"}",
+        )
+    }
+    GlassCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(label, style = MaterialTheme.typography.titleLarge)
+            Text(
+                "${(fraction * 100).toInt()}%",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        Text(
+            caption,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 2.dp, bottom = 12.dp),
+        )
+        GlassProgressBar(progress = fraction, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -113,7 +207,7 @@ private fun Stat(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             value,
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.primary,
         )
         Text(
@@ -124,3 +218,29 @@ private fun Stat(label: String, value: String) {
         )
     }
 }
+
+// region text helpers
+private fun cosmosTitle(view: CosmosView, progress: GalaxyProgress, planetTitle: String): String =
+    when (view) {
+        CosmosView.PLANET -> planetTitle
+        CosmosView.SOLAR_SYSTEM -> "Solar System ${progress.currentSystemIndex + 1}"
+        CosmosView.GALAXY -> "Galaxy"
+    }
+
+private fun cosmosSubtitle(view: CosmosView, progress: GalaxyProgress): String =
+    when (view) {
+        CosmosView.PLANET -> "Growing now — ${stageLabel(progress.stage)}"
+        CosmosView.SOLAR_SYSTEM -> "Complete 8 planets to ignite this system"
+        CosmosView.GALAXY -> "Each completed system becomes a star"
+    }
+
+private fun stageLabel(stage: PlanetStage): String = when (stage) {
+    PlanetStage.PLANET -> "Forming"
+    PlanetStage.MOON -> "Capturing a moon"
+    PlanetStage.RINGS -> "Forming rings"
+}
+
+/** A soft, unbounded sense of galaxy fullness for the progress bar (visual only). */
+private fun galaxyFraction(systemsCompleted: Int): Float =
+    (systemsCompleted / 8f).coerceIn(0f, 1f)
+// endregion

@@ -15,10 +15,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.orbit.blocker.ui.blocks.BlocksScreen
+
 import com.orbit.blocker.ui.components.DockItem
 import com.orbit.blocker.ui.components.GlassDock
 import com.orbit.blocker.ui.components.SpaceBackground
+import com.orbit.blocker.ui.dev.DeveloperScreen
 import com.orbit.blocker.ui.digest.DigestScreen
 import com.orbit.blocker.ui.focus.FocusScreen
 import com.orbit.blocker.ui.home.HomeScreen
@@ -73,13 +74,16 @@ fun OrbitApp() {
             ) {
                 composable(OrbitDestination.HOME.route) { HomeScreen() }
                 composable(OrbitDestination.FOCUS.route) { FocusScreen() }
-                composable(OrbitDestination.BLOCKS.route) { BlocksScreen() }
                 composable(OrbitDestination.QUIZ.route) { QuizBankScreen() }
                 composable(OrbitDestination.DIGEST.route) { DigestScreen() }
                 composable(OrbitDestination.SETTINGS.route) {
                     SettingsScreen(
                         onOpenQuizBank = { navController.navigate(OrbitDestination.QUIZ.route) },
+                        onOpenDeveloper = { navController.navigate(OrbitDestination.DEVELOPER.route) },
                     )
+                }
+                composable(OrbitDestination.DEVELOPER.route) {
+                    DeveloperScreen(onBack = { navController.popBackStack() })
                 }
             }
         }

@@ -107,11 +107,8 @@ class FocusSessionService : android.app.Service() {
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val stopIntent = PendingIntent.getService(
-            this, 1,
-            Intent(this, FocusSessionService::class.java).setAction(ACTION_STOP),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-        )
+        // No stop action: a focus session is a hard commitment. The only way "out" is to
+        // wait for the timer or pass the quiz gate on a blocked app.
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setContentTitle("Focus session in progress")
@@ -119,7 +116,6 @@ class FocusSessionService : android.app.Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(contentIntent)
-            .addAction(0, "End session", stopIntent)
             .build()
     }
 

@@ -74,6 +74,25 @@ class GateDecisionTest {
     }
 
     @Test
+    fun gates_activeSession_whenPackageIncluded_evenWithoutRule() {
+        // "Block all by default": the session set is authoritative, so a package with no
+        // stored FOCUS_SESSION rule is still gated while it's part of the active session.
+        val focus = FocusSessionState(active = true, blockedPackages = setOf(pkg), endsAt = now + 1000)
+        val gate = GateDecision.shouldGate(pkg, emptyList(), focus, hasActiveGrant = false, now = now)
+
+        assertThat(gate).isTrue()
+    }
+
+    @Test
+    fun doesNotGate_activeSession_whenPackageAllowed_evenWithoutRule() {
+        // An allow-listed app is simply absent from the session set, so it is never gated.
+        val focus = FocusSessionState(active = true, blockedPackages = setOf("com.other.app"), endsAt = now + 1000)
+        val gate = GateDecision.shouldGate(pkg, emptyList(), focus, hasActiveGrant = false, now = now)
+
+        assertThat(gate).isFalse()
+    }
+
+    @Test
     fun doesNotGate_focusRule_whenPackageNotInSession() {
         val rules = listOf(focusRule())
         val focus = FocusSessionState(active = true, blockedPackages = setOf("com.other.app"), endsAt = now + 1000)

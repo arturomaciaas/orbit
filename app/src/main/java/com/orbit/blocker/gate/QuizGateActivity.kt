@@ -49,25 +49,51 @@ class QuizGateActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     QuizGateScreen(
                         appLabel = appLabel,
-                        onPassed = { grantAccessAndFinish() },
-                        onFailed = { result ->
-                            lifecycleScope.launch {
-                                gamificationEvents.onWrongAnswer(result.wrong.size)
-                                goHomeAndFinish()
-                            }
-                        },
+                        onPassed = { result -> onQuizFinished(passed = true, result.wrong.size) },
+                        onFailed = { result -> onQuizFinished(passed = false, result.wrong.size) },
                         onDismissNotEnough = { goHomeAndFinish() },
+                        onQuickAccess = { grantQuickAccessAndFinish() },
                     )
                 }
             }
         }
     }
 
-    private fun grantAccessAndFinish() {
+    /**
+     * Handles a graded quiz. On pass, grants the full access window and returns to the app.
+     * On fail, sends the user home. In either case, getting [METEOR_WRONG_THRESHOLD] or more
+     * questions wrong triggers a meteor strike — so a single miss is forgiven, but 2-of-3
+     * wrong costs a planet even if the (lenient) pass threshold was still met.
+     */
+    private fun onQuizFinished(passed: Boolean, wrongCount: Int) {
         lifecycleScope.launch {
+            if (wrongCount >= METEOR_WRONG_THRESHOLD) {
+                gamificationEvents.onMeteorStrike()
+            }
+            if (passed) {
+                if (blockedPackage.isNotEmpty()) {
+                    val window = settings.accessWindowMillis.first()
+                    accessGrantRepository.grantAccess(blockedPackage, window)
+                }
+                finish()
+            } else {
+                goHomeAndFinish()
+            }
+        }
+    }
+
+    /**
+     * The 1-minute quick-access bypass: skips the quiz, grants a fixed 1-minute window, and
+     * always triggers a meteor strike (destroying a planet). High convenience, high cost.
+     */
+    private fun grantQuickAccessAndFinish() {
+        lifecycleScope.launch {
+            gamificationEvents.onMeteorStrike()
             if (blockedPackage.isNotEmpty()) {
-                val window = settings.accessWindowMillis.first()
-                accessGrantRepository.grantAccess(blockedPackage, window)
+                accessGrantRepository.grantAccess(
+                    blockedPackage,
+                    OrbitSettings.QUICK_ACCESS_WINDOW_MILLIS,
+                )
             }
             finish()
         }
@@ -91,6 +117,9 @@ class QuizGateActivity : ComponentActivity() {
     companion object {
         private const val EXTRA_PACKAGE = "extra_package"
         private const val EXTRA_LABEL = "extra_label"
+
+        /** Wrong answers at/above this count trigger a meteor strike (2 of 3 wrong). */
+        private const val METEOR_WRONG_THRESHOLD = 2
 
         fun intent(context: Context, packageName: String, label: String?): Intent =
             Intent(context, QuizGateActivity::class.java).apply {

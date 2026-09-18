@@ -2,6 +2,7 @@ package com.orbit.blocker.service
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
+import android.media.AudioManager
 import android.view.accessibility.AccessibilityEvent
 import com.orbit.blocker.domain.block.BlockEnforcer
 import com.orbit.blocker.gate.QuizGateActivity
@@ -62,12 +63,28 @@ class OrbitAccessibilityService : AccessibilityService() {
 
         if (gatePending) return
 
+        // Never throw the gate up during an active call. The window is time-boxed and
+        // re-gating is purely event-driven (we don't proactively kick the user out), so a
+        // call that outlives its access grant is left alone — the gate only reappears on the
+        // next foreground change *after* the call ends. This guarantees Orbit never hangs up.
+        if (isCallActive()) return
+
         scope.launch {
             if (blockEnforcer.shouldGate(pkg, now)) {
                 gatePending = true
                 launchGate(pkg)
             }
         }
+    }
+
+    /**
+     * True when the device is in a phone or VoIP call. [AudioManager.MODE_IN_CALL] covers
+     * cellular calls; [AudioManager.MODE_IN_COMMUNICATION] covers VoIP (WhatsApp, Meet, etc.).
+     */
+    private fun isCallActive(): Boolean {
+        val audio = getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return false
+        return audio.mode == AudioManager.MODE_IN_CALL ||
+            audio.mode == AudioManager.MODE_IN_COMMUNICATION
     }
 
     private fun launchGate(pkg: String) {

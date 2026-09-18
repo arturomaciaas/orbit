@@ -15,10 +15,11 @@ data class OrbitBackup(
     val blockRules: List<BlockRuleDto> = emptyList(),
     val questions: List<QuestionDto> = emptyList(),
     val galaxy: GalaxyProgressDto? = null,
+    val completedPlanets: List<CompletedPlanetDto> = emptyList(),
     val focusSessions: List<FocusSessionDto> = emptyList(),
 ) {
     companion object {
-        const val CURRENT_VERSION = 1
+        const val CURRENT_VERSION = 2
     }
 }
 
@@ -51,13 +52,26 @@ data class QuestionDto(
 
 @Serializable
 data class GalaxyProgressDto(
+    val activePlanetType: String = "TERRAN",
     val stage: String,
     val progress: Float,
+    val planetsInSystem: Int = 0,
+    val currentSystemIndex: Int = 0,
+    val systemsCompleted: Int = 0,
     val totalSessionsCompleted: Int,
     val currentStreakDays: Int,
     val longestStreakDays: Int,
     val lastSessionCompletedAt: Long?,
     val meteorStrikes: Int,
+    val doomedPlanetId: Long? = null,
+)
+
+@Serializable
+data class CompletedPlanetDto(
+    val systemIndex: Int,
+    val slot: Int,
+    val type: String,
+    val completedAt: Long,
 )
 
 @Serializable

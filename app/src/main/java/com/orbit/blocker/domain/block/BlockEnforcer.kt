@@ -41,14 +41,17 @@ class BlockEnforcer @Inject constructor(
      */
     suspend fun shouldGate(packageName: String, now: Long = System.currentTimeMillis()): Boolean {
         val rules = cachedRules.value.filter { it.packageName == packageName }
-        // Fast path: nothing references this package.
-        if (rules.isEmpty()) return false
+        val focus = focusSessionManager.current()
+        // Fast path: nothing references this package. A package is "referenced" if it has a
+        // rule OR the active focus session covers it (block-all-by-default sessions carry the
+        // package set directly, so most gated apps won't have a stored rule).
+        if (rules.isEmpty() && !focus.isPackageBlocked(packageName)) return false
 
         val hasGrant = accessGrantRepository.hasActiveGrant(packageName, now)
         return GateDecision.shouldGate(
             packageName = packageName,
             rules = rules,
-            focus = focusSessionManager.current(),
+            focus = focus,
             hasActiveGrant = hasGrant,
             now = now,
         )

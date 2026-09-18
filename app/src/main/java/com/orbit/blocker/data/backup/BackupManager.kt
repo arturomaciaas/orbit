@@ -38,6 +38,7 @@ class BackupManager @Inject constructor(
                 blockRules = db.blockRuleDao().getAll().map { it.toDto() },
                 questions = db.questionDao().getAll().map { it.toDto() },
                 galaxy = db.galaxyProgressDao().get()?.toDto(),
+                completedPlanets = db.completedPlanetDao().getAll().map { it.toDto() },
                 focusSessions = db.focusSessionDao().getAll().map { it.toDto() },
             )
         }
@@ -82,8 +83,12 @@ class BackupManager @Inject constructor(
             dao.insertAll(backup.questions.map { it.toEntity() })
         }
 
-        // Replace galaxy progress (singleton row).
+        // Replace galaxy progress (singleton row) + completed planets.
         backup.galaxy?.let { db.galaxyProgressDao().upsert(it.toEntity()) }
+        db.completedPlanetDao().let { dao ->
+            dao.deleteAll()
+            backup.completedPlanets.forEach { dao.insert(it.toEntity()) }
+        }
 
         // Replace focus history.
         db.focusSessionDao().deleteAll()

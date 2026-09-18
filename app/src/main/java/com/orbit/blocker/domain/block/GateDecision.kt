@@ -39,6 +39,12 @@ object GateDecision {
         focus: FocusSessionState,
         now: Long = System.currentTimeMillis(),
     ): Boolean {
+        // An active focus session is authoritative: it blocks every package in its set,
+        // regardless of whether a stored FOCUS_SESSION rule exists. This is what enables
+        // "block all apps by default" (the session carries the full package set minus the
+        // user's allow-list) without persisting a rule per installed app.
+        if (focus.isPackageBlocked(packageName)) return true
+
         val relevant = rules.filter { it.packageName == packageName && it.enabled }
 
         val durationBlocked = relevant.any { rule ->

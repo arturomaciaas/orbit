@@ -1,7 +1,6 @@
 package com.orbit.blocker.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Quiz
@@ -19,9 +18,10 @@ enum class OrbitDestination(
 ) {
     HOME("home", "Cosmos", Icons.Filled.Public),
     FOCUS("focus", "Focus", Icons.Filled.Timer),
-    BLOCKS("blocks", "Blocks", Icons.Filled.Block),
     // Quiz Bank is reachable from Settings, so it is hidden from the dock.
     QUIZ("quiz", "Quiz Bank", Icons.Filled.Quiz, showInBottomBar = false),
+    // Developer preview is reachable from Settings, hidden from the dock.
+    DEVELOPER("developer", "Developer", Icons.Filled.Quiz, showInBottomBar = false),
     DIGEST("digest", "Digest", Icons.Filled.Notifications),
     SETTINGS("settings", "Settings", Icons.Filled.Settings),
     ;

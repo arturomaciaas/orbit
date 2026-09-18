@@ -66,5 +66,9 @@ else
     which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH."
 fi
 
-exec "$JAVACMD" $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS \
-  -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
+# Split the JVM opts safely (they are stored as a quoted, space-separated string) so tokens
+# like "-Xmx64m" are passed as real JVM args rather than a literal main-class argument.
+eval "set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS \
+  -classpath \"\$CLASSPATH\" org.gradle.wrapper.GradleWrapperMain \"\$@\""
+
+exec "$JAVACMD" "$@"

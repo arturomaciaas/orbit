@@ -3,8 +3,9 @@ package com.orbit.blocker.data.db
 import androidx.room.TypeConverter
 import com.orbit.blocker.data.model.BlockMode
 import com.orbit.blocker.data.model.FocusOutcome
-import com.orbit.blocker.data.model.GalaxyStage
 import com.orbit.blocker.data.model.NotificationTier
+import com.orbit.blocker.data.model.PlanetStage
+import com.orbit.blocker.data.model.PlanetType
 import com.orbit.blocker.data.model.QuizTopic
 
 /**
@@ -34,10 +35,16 @@ class Converters {
     fun stringToNotificationTier(value: String): NotificationTier = NotificationTier.valueOf(value)
 
     @TypeConverter
-    fun galaxyStageToString(value: GalaxyStage): String = value.name
+    fun planetStageToString(value: PlanetStage): String = value.name
 
     @TypeConverter
-    fun stringToGalaxyStage(value: String): GalaxyStage = GalaxyStage.valueOf(value)
+    fun stringToPlanetStage(value: String): PlanetStage = PlanetStage.valueOf(value)
+
+    @TypeConverter
+    fun planetTypeToString(value: PlanetType): String = value.name
+
+    @TypeConverter
+    fun stringToPlanetType(value: String): PlanetType = PlanetType.valueOf(value)
 
     @TypeConverter
     fun focusOutcomeToString(value: FocusOutcome): String = value.name

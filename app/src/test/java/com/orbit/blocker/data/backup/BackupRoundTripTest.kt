@@ -7,10 +7,12 @@ import com.orbit.blocker.data.model.BlockMode
 import com.orbit.blocker.data.model.BlockRule
 import com.orbit.blocker.data.model.BlockedApp
 import com.orbit.blocker.data.model.FocusOutcome
+import com.orbit.blocker.data.model.CompletedPlanet
 import com.orbit.blocker.data.model.FocusSessionRecord
 import com.orbit.blocker.data.model.GalaxyProgress
-import com.orbit.blocker.data.model.GalaxyStage
 import com.orbit.blocker.data.model.NotificationTier
+import com.orbit.blocker.data.model.PlanetStage
+import com.orbit.blocker.data.model.PlanetType
 import com.orbit.blocker.data.model.Question
 import com.orbit.blocker.data.model.QuizTopic
 import kotlinx.serialization.encodeToString
@@ -33,7 +35,22 @@ class BackupRoundTripTest {
         questions = listOf(
             Question(topic = QuizTopic.AWS, prompt = "q", choices = listOf("a", "b"), correctIndex = 1, seeded = true).toDto(),
         ),
-        galaxy = GalaxyProgress(stage = GalaxyStage.RINGS, progress = 0.5f, totalSessionsCompleted = 8, currentStreakDays = 3, longestStreakDays = 5, meteorStrikes = 2).toDto(),
+        galaxy = GalaxyProgress(
+            activePlanetType = PlanetType.ICE_GIANT,
+            stage = PlanetStage.RINGS,
+            progress = 0.5f,
+            planetsInSystem = 2,
+            currentSystemIndex = 1,
+            systemsCompleted = 1,
+            totalSessionsCompleted = 8,
+            currentStreakDays = 3,
+            longestStreakDays = 5,
+            meteorStrikes = 2,
+        ).toDto(),
+        completedPlanets = listOf(
+            CompletedPlanet(id = 1, systemIndex = 1, slot = 0, type = PlanetType.TERRAN, completedAt = 111).toDto(),
+            CompletedPlanet(id = 2, systemIndex = 1, slot = 1, type = PlanetType.ROGUE, completedAt = 222).toDto(),
+        ),
         focusSessions = listOf(
             FocusSessionRecord(startedAt = 10, endedAt = 20, plannedDurationMillis = 10, outcome = FocusOutcome.COMPLETED, blockedPackageCount = 2).toDto(),
         ),
@@ -60,8 +77,24 @@ class BackupRoundTripTest {
         assertThat(restoredRule.expiresAt).isEqualTo(rule.expiresAt)
         assertThat(restoredRule.enabled).isEqualTo(rule.enabled)
 
-        val galaxy = GalaxyProgress(stage = GalaxyStage.SYSTEM, progress = 0.7f, totalSessionsCompleted = 12)
+        val galaxy = GalaxyProgress(
+            activePlanetType = PlanetType.ROGUE,
+            stage = PlanetStage.RINGS,
+            progress = 0.7f,
+            planetsInSystem = 3,
+            currentSystemIndex = 2,
+            systemsCompleted = 2,
+            totalSessionsCompleted = 12,
+        )
         assertThat(galaxy.toDto().toEntity()).isEqualTo(galaxy)
+
+        val planet = CompletedPlanet(id = 9, systemIndex = 2, slot = 4, type = PlanetType.ICE_GIANT, completedAt = 555)
+        // id is not part of the DTO; compare meaningful fields.
+        val restoredPlanet = planet.toDto().toEntity()
+        assertThat(restoredPlanet.systemIndex).isEqualTo(planet.systemIndex)
+        assertThat(restoredPlanet.slot).isEqualTo(planet.slot)
+        assertThat(restoredPlanet.type).isEqualTo(planet.type)
+        assertThat(restoredPlanet.completedAt).isEqualTo(planet.completedAt)
     }
 
     @Test

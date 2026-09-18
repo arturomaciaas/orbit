@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +53,7 @@ fun QuizGateScreen(
     onPassed: (QuizResult) -> Unit = {},
     onFailed: (QuizResult) -> Unit = {},
     onDismissNotEnough: () -> Unit = {},
+    onQuickAccess: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -93,6 +95,7 @@ fun QuizGateScreen(
                 appLabel = appLabel,
                 onSelect = viewModel::select,
                 onNext = viewModel::next,
+                onQuickAccess = onQuickAccess,
             )
 
             is QuizGateState.Finished -> QuizFinished(
@@ -112,6 +115,7 @@ private fun QuizInProgress(
     appLabel: String?,
     onSelect: (Int) -> Unit,
     onNext: () -> Unit,
+    onQuickAccess: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         if (appLabel != null) {
@@ -157,6 +161,35 @@ private fun QuizInProgress(
             modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
         ) {
             Text(if (state.isLast) "Submit" else "Next")
+        }
+
+        QuickAccessButton(onQuickAccess = onQuickAccess)
+    }
+}
+
+/**
+ * The "1-minute quick access" bypass. Skips the quiz and grants a single minute — but at a
+ * cost: it triggers a meteor strike that destroys a planet. Styled as a subdued, clearly
+ * risky shortcut rather than a primary action.
+ */
+@Composable
+private fun QuickAccessButton(onQuickAccess: () -> Unit) {
+    TextButton(
+        onClick = onQuickAccess,
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                "Skip — 1 min access",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.error,
+            )
+            Text(
+                "Triggers a meteor strike (destroys a planet)",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
