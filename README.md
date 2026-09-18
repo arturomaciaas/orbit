@@ -56,5 +56,5 @@ Requirements: JDK 17, Android SDK 35, a device on Android 12+ (API 31).
 ## See the cosmos:
 
 <div align="center">
-<img src="docs/assets/cosmos.gif" alt="What the cosmos look like" width="280" />
+<img src="docs/assets/cosmos.gif" alt="What the cosmos look like"/>
 </div>
